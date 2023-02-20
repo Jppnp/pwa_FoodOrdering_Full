@@ -1,40 +1,59 @@
 version: '3.9'
+name: "pwa_app"
 services:
   postgres:
-    image: postgres:latest
     container_name: postgres
+    image: postgres:13-alpine
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
     ports:
       - '6500:5432'
-    volumes:
-      - progresDB:/var/lib/postgresql/data
     env_file:
-      - ./Backend/app.env
+      - ./app.env
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
     networks:
       - pwa_app
 
-
   server:
-    image: golang-api:latest
+    build: Backend
     container_name: server-api
     ports:
       - '8000:8000'
     depends_on:
       - postgres
+    env_file:
+      - ./app.env
     networks:
       - pwa_app
-    command: go run main.go
-  web:
-    image: pwa_react:latest
-    container_name: web
-    ports:
-      - '3000:3000'
-    depends_on:
-      - postgres
-    networks:
-      - pwa_app
-    command: bash -c "serve -s build"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        go run main.go
+        tail -f /dev/null
+
+
+
+
+
+  # web:
+  #   build: FrontEnd
+  #   container_name: web
+  #   ports:
+  #     - '3000:3000'
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - ./app.env
+  #   command: bash -c "serve -s build"
+
 volumes:
-  progresDB:
+  postgres_data:
 networks:
   pwa_app:
     driver: bridge

@@ -1,4 +1,4 @@
-FROM node:18.14.0
+FROM node:18.14-alpine
 
 ENV NODE_ENV=production
 
@@ -10,6 +10,8 @@ RUN npm install --production
 
 RUN npm ci 
 RUN npm install -g serve
+RUN apk update && apk add bash
+
 
 COPY . .
 

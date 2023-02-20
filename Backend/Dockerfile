@@ -1,15 +1,29 @@
-# syntax=docker/dockerfile:1
-FROM golang:1.19
+FROM golang:1.19-alpine
 
 WORKDIR /app
 
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
-COPY go.mod ./
-COPY go.sum ./
-RUN go mod download && go mod verify
+# Copy go.mod and go.sum files
+COPY ["go.mod", "go.sum", "./"]
 
-COPY . .
+# Download and install Go dependencies
+RUN go mod download
+
+# Copy the rest of the application files
+COPY . /app
 
 
+# Make the wait-for-db.sh script executable
+COPY run.sh /app/run.sh
+RUN chmod +x /app/run.sh
 
-CMD ["/main"]
+RUN chmod 755 /app/wait-for-db.sh
+
+# Set the entry point to wait-for-db.sh script
+RUN CGO_ENABLED=0 go build -o app
+
+# ENTRYPOINT ["sh", "/app/wait-for-db.sh"]
+
+
+# CMD ["tail", "-f", "/dev/null"]
+
+
