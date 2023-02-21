@@ -39,29 +39,24 @@ services:
         go run main.go
         tail -f /dev/null
 
-
   web:
-    build: Frontend
+    build: FrontEnd
     container_name: web
     ports:
       - '3000:3000'
     depends_on:
       - postgres
-    volumes:
-      - ./Frontend/:/app/
-      - ignore:/app/node_modules
     env_file:
       - ./app.env
     command:
       - /bin/bash
       - -c
       - |
-        npm run start
+        serve -s build
         tail -f /dev/null
 
 volumes:
   postgres_data:
-  ignore:
 networks:
   pwa_app:
     driver: bridge
