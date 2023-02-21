@@ -47,7 +47,12 @@ services:
       - postgres
     env_file:
       - ./app.env
-    command: bash -c "serve -s build"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        serve -s build
+        tail -f /dev/null
 
 volumes:
   postgres_data:
