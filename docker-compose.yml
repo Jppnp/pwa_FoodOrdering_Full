@@ -38,19 +38,16 @@ services:
         tail -f /dev/null
 
 
-
-
-
-  # web:
-  #   build: FrontEnd
-  #   container_name: web
-  #   ports:
-  #     - '3000:3000'
-  #   depends_on:
-  #     - postgres
-  #   env_file:
-  #     - ./app.env
-  #   command: bash -c "serve -s build"
+  web:
+    build: Frontend
+    container_name: web
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+    env_file:
+      - ./app.env
+    command: bash -c "serve -s build"
 
 volumes:
   postgres_data:
