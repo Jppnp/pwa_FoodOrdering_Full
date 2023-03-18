@@ -7,7 +7,6 @@ import Header from "./components/Header";
 import ShowUsers from "./components/ShowUsers";
 import AddUser from "./components/AddUser";
 import Update from "./components/Update";
-console.log(process.env.REACT_APP_BASE_URL)
 
 function App() {
   return (
