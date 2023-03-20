@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import ShowUsers from "./components/ShowUsers";
 import AddUser from "./components/AddUser";
 import Update from "./components/Update";
+import LocationMap from "./components/LocationMap";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/users" element={<ShowUsers />} />
           <Route path="/add" element={<AddUser />} />
           <Route path="/update" element={<Update />} />
+          <Route path="/map" element={<LocationMap />} />
         </Routes>
       </div>
     </BrowserRouter>

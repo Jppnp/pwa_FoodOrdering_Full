@@ -96,7 +96,7 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
   if (event.action === 'view') {
     console.log('Push notification clicked with action "view".');
-    clientsClaim.openWindow(event.notification.data.url);
+    clients.openWindow(event.notification.data.url);
   } else if (event.action === 'dismiss') {
     console.log('Push notification clicked with action "dismiss".');
   } else {

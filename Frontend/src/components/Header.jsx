@@ -28,6 +28,7 @@ function Header() {
             <Nav.Link as={Link} to ="/">Home</Nav.Link>
             <Nav.Link as={Link} to ="/users">Show Users</Nav.Link>
             <Nav.Link as={Link} to ="/add">Add User</Nav.Link>
+            <Nav.Link as={Link} to ="/map">Map</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
