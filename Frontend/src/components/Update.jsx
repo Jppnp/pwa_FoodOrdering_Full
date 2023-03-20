@@ -1,7 +1,7 @@
 import {React, useState, useEffect} from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
-import { Button, Card, Form, Row, Col, Modal } from "react-bootstrap";
+import { Button, Card, Form, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 
@@ -14,11 +14,6 @@ function Update() {
   const [femail, setEmail] = useState("");
   const [fpassword, setPassword] = useState("");
   const [fphone, setPhone] = useState("");
-
-  const [show, setShow] = useState(false)
-  const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true)
-
 
   const client = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL,
