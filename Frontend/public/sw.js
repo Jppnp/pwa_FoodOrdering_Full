@@ -1,6 +1,5 @@
 let cacheData = "pwaV1";
 this.addEventListener("install", (event) => {
-  var clientId = event.source.id; // Get the ID of client
   event.waitUntil(
     caches.open(cacheData).then((cache) => {
       cache.addAll([
@@ -61,20 +60,5 @@ this.addEventListener("notificationclick", (event) => {
     console.log('Push notification clicked with action "dismiss".');
   } else {
     console.log("Push notification clicked with no action.");
-  }
-});
-
-self.addEventListener("message", (event) => {
-  if (event.data.action === "get-location") {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
-
-      self.clients.get(clientId).then(function (client) {
-        client.postMessage({ location: location });
-      });
-    });
   }
 });
