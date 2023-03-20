@@ -10,16 +10,18 @@ function PushBtn() {
 
           setTimeout(() => {
             if ("serviceWorker" in navigator && "PushManager" in window) {
-              console.log("Service worker and push messaging supported");
               navigator.serviceWorker.ready.then((registration) => {
-                registration.showNotification("My App", {
+                registration.showNotification("Pwa", {
                   body: "Hello, World!",
+                  data: { url: "/" },
+                  actions: [
+                    { action: "view", title: "View" },
+                    { action: "dismiss", title: "Dismiss" },
+                  ],
                 });
               });
-            } else {
-              console.log("Service worker or push messaging not supported");
             }
-          }, 1000);
+          }, 2000);
         } else {
           console.log("Notification permission not granted");
         }
@@ -31,7 +33,7 @@ function PushBtn() {
 
   return (
     <button onClick={handleNotificationClick}>
-      Send Push Notification in 5 seconds
+      Send Push Notification in 2 seconds
     </button>
   );
 }
