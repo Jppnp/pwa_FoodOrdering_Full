@@ -71,35 +71,3 @@ self.addEventListener("message", (event) => {
 });
 
 // Any other custom service worker logic can go here.
-
-self.addEventListener('push', (event) => {
-  const payload = event.data ? event.data.text() : 'New notification!';
-  const options = {
-    body: payload,
-    icon: '/path/to/icon.png',
-    badge: '/path/to/badge.png',
-    data: { url: '/' },
-    actions: [
-      { action: 'view', title: 'View' },
-      { action: 'dismiss', title: 'Dismiss' }
-    ]
-  };
-  console.log('Push notification received:', payload);
-  event.waitUntil(
-    self.registration.showNotification('My App', options)
-      .then(() => console.log('Push notification shown:', payload))
-      .catch(error => console.error('Error showing push notification:', error))
-  );
-});
-
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  if (event.action === 'view') {
-    console.log('Push notification clicked with action "view".');
-    clients.openWindow(event.notification.data.url);
-  } else if (event.action === 'dismiss') {
-    console.log('Push notification clicked with action "dismiss".');
-  } else {
-    console.log('Push notification clicked with no action.');
-  }
-});
