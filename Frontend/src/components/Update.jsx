@@ -28,7 +28,7 @@ function Update() {
       setPhone(data.phone)
       setPassword(data.setPassword)
     })
-  })
+  }, [])
 
   function handleChange(event) {
     var id = event.target.id;
