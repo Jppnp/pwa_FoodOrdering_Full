@@ -9,6 +9,7 @@ this.addEventListener("install", (event) => {
         "/index.html",
         "/",
         "/users",
+        "/static/"
       ]);
     })
   );
@@ -32,23 +33,6 @@ this.addEventListener("fetch", (event) => {
       })
     );
   }
-});
-
-this.addEventListener("push", (event) => {
-  const payload = event.data ? event.data.text() : "New notification";
-  const options = {
-    body: payload,
-    data: { url: "/" },
-    actions: [
-      { action: "view", title: "View" },
-      { action: "dismiss", title: "Dismiss" },
-    ],
-  };
-  event.waitUntil(
-    this.registration
-      .showNotification("Pwa", options)
-      .then(() => console.log(`Push Notification shown: ${payload}`))
-  );
 });
 
 this.addEventListener("notificationclick", (event) => {
