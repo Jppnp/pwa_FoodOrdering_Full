@@ -1,18 +1,17 @@
 FROM golang:1.19-alpine
 
+ENV GO111MODULE=on \
+    CGO_ENABLED=0
+
 WORKDIR /app
 
-# Copy go.mod and go.sum files
-COPY ["go.mod", "go.sum", "./"]
 
-# Download and install Go dependencies
+COPY ["go.mod", "go.sum", "./"]
 RUN go mod download
 
-# Copy the rest of the application files
 COPY . /app
+RUN go get github.com/githubnemo/CompileDaemon
+RUN go install github.com/githubnemo/CompileDaemon
 
 
-# Set the entry point to wait-for-db.sh script
-RUN CGO_ENABLED=0 go build -o app
-
-
+ENTRYPOINT CompileDaemon -build="go build -o /build/app" -command="/build/app"

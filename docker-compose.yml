@@ -40,19 +40,25 @@ services:
         tail -f /dev/null
 
   web:
-    build: FrontEnd
+    build: Frontend
     container_name: web
     ports:
       - '3000:3000'
+      - '9229:9229'
+    volumes:
+      - ./Frontend:/app/
+      - /app/node_modules
     depends_on:
       - postgres
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./app.env
     command:
       - /bin/bash
       - -c
       - |
-        serve -s build
+        npm start
         tail -f /dev/null
 
 volumes:
