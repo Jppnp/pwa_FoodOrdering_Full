@@ -3,7 +3,7 @@ import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
-  const totalPrice = 0;
+  var totalPrice = 0;
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
@@ -18,11 +18,11 @@ const Cart = () => {
     totalPrice = 0;
   };
 
-  const calPrice= (price) => {
+  const calPrice = (price) => {
     totalPrice += price;
-  }
+  };
 
-  console.log('totalPrice:' + totalPrice)
+  console.log("totalPrice:" + totalPrice);
   return (
     <Container>
       <Row>
@@ -36,14 +36,26 @@ const Cart = () => {
                     <ListGroup.Item>
                       <h3>{item.name}</h3>
                       <p>{item.description}</p>
-                      <p>Price: {item.price}</p>
-                      <p>Note: {item.note}</p>
-                      <p>Quantity: {item.quantity}</p>
+                      <p>
+                        Price:{" "}
+                        {item.quantity > 1
+                          ? `${item.quantity} x ${item.price} = ${
+                              item.price * item.quantity
+                            } บาท`
+                          : `1 x ${item.price} บาท`}
+                      </p>
+                      {calPrice(item.price)}
+                      <p>Note: {item.note !== "" ? item.note : "---"}</p>
+                      <p>Quantity: {`${item.quantity} ชิ้น`}</p>
                     </ListGroup.Item>
                   </ListGroup>
                   {index !== cartItems.length - 1 && <hr />}
                 </div>
               ))}
+              <h3>
+                Total Price :{" "}
+                <span style={{ color: "blue" }}>{totalPrice}</span> บาท
+              </h3>
               <Button
                 variant="danger"
                 onClick={handleClearCart}
