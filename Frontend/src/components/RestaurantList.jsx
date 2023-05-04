@@ -40,11 +40,8 @@ const RestaurantList = () => {
         className="mb-3 justify-content-center"
         style={{ width: "300px" }}
       >
-        <InputGroup.Text>
-          <FaSearch />
-        </InputGroup.Text>
         <FormControl
-          placeholder="Search for a restaurant"
+          placeholder="🔍 Search for a restaurant"
           value={searchTerm}
           onChange={handleSearchChange}
         />
