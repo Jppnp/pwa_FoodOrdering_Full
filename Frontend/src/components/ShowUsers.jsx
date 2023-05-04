@@ -2,7 +2,7 @@ import { Button, Card, Col, Row } from "react-bootstrap";
 // import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
-import { TiDelete, TiSpanner } from "react-icons/ti";
+import { TiSpanner } from "react-icons/ti";
 import { Link } from "react-router-dom";
 
 // const client = axios.create({
