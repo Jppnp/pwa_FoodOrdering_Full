@@ -20,7 +20,7 @@ export default function Header2() {
             className="d-inline-block align-top"
             style={{marginRight: '1rem'}}
           />
-          สมชาย ภัคดีมาก
+          <span>ยินดีต้อนรับ, สมชาย ภัคดีมาก</span>
           </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="navbarScroll"
@@ -39,6 +39,9 @@ export default function Header2() {
             </NavLink>
             <NavLink eventKey="7" as={Link} to="/history ">
               History
+            </NavLink>
+            <NavLink eventKey="8" as={Link} to="/notification ">
+              Notification
             </NavLink>
           </Nav>
         </Navbar.Collapse>

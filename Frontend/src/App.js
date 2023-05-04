@@ -16,6 +16,7 @@ import Menus from "./components/Menus";
 import OrderForm from "./components/OrderForm";
 import Cart from "./components/Cart";
 import OrderHistory from "./components/OrderHistory";
+import Notification from "./components/Notification";
 
 function App() {
   console.warn("Hello");
@@ -31,6 +32,7 @@ function App() {
           <Route path="/order" element={<OrderForm />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/history" element={<OrderHistory />} />
+          <Route path="/notification" element={<Notification />} />
         </Routes>
       </div>
     </BrowserRouter>
