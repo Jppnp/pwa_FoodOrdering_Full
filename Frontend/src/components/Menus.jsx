@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import { Tab } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
+
 
 export default function Menus() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,7 +112,7 @@ export default function Menus() {
                             overflow: "hidden",
                           }}
                         >
-                          <Row noGutters>
+                          <Row>
                             <Col
                               xs={4}
                               md={4}

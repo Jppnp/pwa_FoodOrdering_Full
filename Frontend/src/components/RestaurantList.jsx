@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Card, InputGroup, FormControl } from "react-bootstrap";
-import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const RestaurantList = () => {

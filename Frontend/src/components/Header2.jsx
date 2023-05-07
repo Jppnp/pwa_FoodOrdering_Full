@@ -1,6 +1,6 @@
+import React from 'react';
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
 export default function Header2() {
   return (
     <Navbar

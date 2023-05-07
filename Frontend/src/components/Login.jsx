@@ -1,48 +1,71 @@
-import { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
-// import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { userLogin } from "../utils/UserLogin";
+import { useNavigate } from "react-router-dom";
+import { Form, Button, Modal } from "react-bootstrap";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // handle login logic here
-    if (email === 'example@gmail.com' && password === 'password') {
-      // successful login
-      console.log('Logged in successfully!');
-      this.props.navigation.navigate("/")
-
+  const handleLogin = () => {
+    // Here, you would define the logic for checking the user's credentials and setting their role
+    // For example:
+    if (username === "admin" && password === "admin") {
+      userLogin('admin')
+      navigate("/");
+    } else if (username === "client" && password === "client") {
+      userLogin('client')
+      navigate("/client");
     } else {
-      // unsuccessful login
-      setShowAlert(true);
+      setShowModal(true);
     }
   };
 
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
-    <div className="container mt-5">
-      <Form onSubmit={handleSubmit} style={{padding: '1rem', margin: '2rem'}} >
-        {showAlert && (
-          <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible>
-            Incorrect email or password. Please try again.
-          </Alert>
-        )}
-        <Form.Group controlId="email">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control type="email" placeholder="Enter email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-        </Form.Group>
-        <Form.Group controlId="password">
-          <Form.Label>Password</Form.Label>
-          <Form.Control type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-        </Form.Group>
-        <Button variant="primary" type="submit" style={{marginTop: '1rem'}}>
-          Login
-        </Button>
-      </Form>
-    </div>
+    <Form>
+      <Form.Group controlId="formBasicUsername">
+        <Form.Label>Username</Form.Label>
+        <Form.Control
+          type="text"
+          placeholder="Enter username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </Form.Group>
+
+      <Form.Group controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </Form.Group>
+
+      <Button variant="primary" type="button" onClick={handleLogin}>
+        Login
+      </Button>
+
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Login Error</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Invalid username or password. Please try again.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </Form>
   );
-};
+}
 
 export default Login;
