@@ -7,7 +7,7 @@ function PrivateRoute(role) {
 
   useEffect(() => {
     if (!isLogin() || getRole() !== role.role) {
-      navigate(-1);
+      navigate('/login');
     }
   }, [navigate, role]);
   return isLogin() ? <Outlet /> : <Navigate to="/login" />;
