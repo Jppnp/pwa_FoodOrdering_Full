@@ -6,6 +6,7 @@ export default function OrderForm() {
 
   const { state } = useLocation();
   const { selectedMenu } = state;
+  
   const {name, description, price, image} = selectedMenu
   const [note, setNote] = useState("");
   const [quantity, setQuantity] = useState(1);
