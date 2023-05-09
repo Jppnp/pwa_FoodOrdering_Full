@@ -40,7 +40,7 @@ export function AdminRoutes() {
   return (
     <div>
       <AdminSidebar />
-      <div style={{ marginLeft: "10vh" }}>
+      <div style={{ marginLeft: "5rem" }}>
         <Routes>
           <Route element={<PrivateRoute role="admin" />}>
             <Route index element={<AdminDashboard />} />

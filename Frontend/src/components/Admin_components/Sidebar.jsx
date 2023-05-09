@@ -19,6 +19,8 @@ export default function AdminSidebar() {
             {" "}
             <h2>Admin</h2>
           </MenuItem>
+          <MenuItem icon={<ManageAccountsIcon />}>Manage Merchant</MenuItem>
+          <MenuItem icon={<StoreIcon />}>Manage Restaurant</MenuItem>
         </Menu>
       </Sidebar>
     </div>
