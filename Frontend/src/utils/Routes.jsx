@@ -39,13 +39,17 @@ export function ClientRoutes() {
 export function AdminRoutes() {
   return (
     <div>
-      <AdminSidebar />
-      <div style={{ marginLeft: "5rem" }}>
-        <Routes>
-          <Route element={<PrivateRoute role="admin" />}>
-            <Route index element={<AdminDashboard />} />
-          </Route>
-        </Routes>
+      <div style={{ display: "flex" }}>
+        <div style={{ flex: "1" }}>
+          <AdminSidebar />
+        </div>
+        <div style={{ flex: "5", marginLeft: "5rem" }}>
+          <Routes>
+            <Route element={<PrivateRoute role="admin" />}>
+              <Route index element={<AdminDashboard />} />
+            </Route>
+          </Routes>
+        </div>
       </div>
     </div>
   );
