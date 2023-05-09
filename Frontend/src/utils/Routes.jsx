@@ -9,8 +9,11 @@ import OrderForm from "../components/OrderForm";
 import Cart from "../components/Cart";
 import OrderHistory from "../components/OrderHistory";
 import Notification from "../components/Notification";
+import AdminDashboard from "../components/Admin_components/Dashboard";
+import NotFound from "../components/Notfound";
+import AdminSidebar from "../components/Admin_components/Sidebar";
 
-export default function AppRoutes() {
+export function ClientRoutes() {
   const location = useLocation();
   const shouldShowHeader = location.pathname !== "/login";
 
@@ -18,16 +21,32 @@ export default function AppRoutes() {
     <div>
       {shouldShowHeader && <Header2 />}
       <Routes>
-        <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Home />} exact />
-          <Route path="/menu" element={<Menus />} exact />
-          <Route path="/restaurants" element={<RestaurantList />} exact />
-          <Route path="/order" element={<OrderForm />} exact />
-          <Route path="/cart" element={<Cart />} exact />
-          <Route path="/history" element={<OrderHistory />} exact />
-          <Route path="/notification" element={<Notification />} exact />
+        <Route element={<PrivateRoute role="client" />}>
+          <Route index element={<Home />} />
+          <Route path="menu" element={<Menus />} />
+          <Route path="restaurants" element={<RestaurantList />} />
+          <Route path="menu/:id" element={<OrderForm />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="history" element={<OrderHistory />} />
+          <Route path="notification" element={<Notification />} />
+          <Route path="*" element-={<NotFound />} />
         </Route>
       </Routes>
+    </div>
+  );
+}
+
+export function AdminRoutes() {
+  return (
+    <div>
+      <AdminSidebar />
+      <div style={{ marginLeft: "10vh" }}>
+        <Routes>
+          <Route element={<PrivateRoute role="admin" />}>
+            <Route index element={<AdminDashboard />} />
+          </Route>
+        </Routes>
+      </div>
     </div>
   );
 }
