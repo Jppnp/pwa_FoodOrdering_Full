@@ -1,15 +1,13 @@
 // Logout.js
-import { useContext } from "react";
-import { UserContext } from "../utils/UserLogin";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
+import { userLogout } from "../utils/UserControl";
 
 function Logout() {
-  const { setUserRole } = useContext(UserContext);
-  const navigate = Navigate();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    setUserRole(null);
+    userLogout();
     navigate("/login");
   };
 

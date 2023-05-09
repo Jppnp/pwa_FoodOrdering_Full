@@ -1,118 +1,140 @@
-import { useState } from "react";
-import { userLogin } from "../utils/UserLogin";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Card, Form, Button, Modal } from "react-bootstrap";
+import bg from "../assets/bg.jpg";
+import { isLogin, getRole, userLogin } from "../utils/UserControl";
 
-function Login() {
+const Login = () => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showBackground, setShowBackground] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+
+  useEffect(() => {
+    if (isLogin()) {
+      const role = getRole();
+      navigate(`/${role}`);
+    }
+  }, [navigate]);
+
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
   const handleLogin = () => {
-    // Here, you would define the logic for checking the user's credentials and setting their role
-    // For example:
+    // Perform login logic here
     if (username === "admin" && password === "admin") {
-      userLogin("admin");
-      navigate("/");
-    } else if (username === "client" && password === "client") {
-      userLogin("client");
+      userLogin("1", "admin");
+      navigate("/admin");
+    } else if (username === "user" && password === "user") {
+      userLogin("1", "client");
       navigate("/client");
     } else {
-      setShowModal(true);
+      handleModal("Invalid username or password");
     }
   };
 
-  const handleCloseModal = () => {
+  useEffect(() => {
+    const handleResize = () => {
+      setShowBackground(window.innerWidth < 992);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const handleModal = (message) => {
+    setModalMessage(message);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
     setShowModal(false);
   };
 
   return (
-    <div>
-      <div class="container-fluid">
-        <div class="row mh-100vh">
-          <div
-            class="col-10 col-sm-8 col-md-6 col-lg-6 offset-1 offset-sm-2 offset-md-3 offset-lg-0 align-self-center d-lg-flex align-items-lg-center align-self-lg-stretch bg-white p-5 rounded rounded-lg-0 my-5 my-lg-0"
-            id="login-block"
-          >
-            <div class="m-auto w-lg-75 w-xl-50">
-              <h2 class="text-info font-weight-light mb-5">
-                <i class="fa fa-diamond"></i>&nbsp;Your company
-              </h2>
-              <form>
-                <div class="form-group">
-                  <label class="text-secondary">Username</label>
-                  <input
-                    class="form-control"
-                    type="text"
-                    required=""
-                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,15}$"
-                    inputmode="text"
-                    onChange={setUsername}
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="text-secondary">Password</label>
-                  <input
-                    class="form-control"
-                    type="password"
-                    required=""
-                    onChange={setPassword}
-                  />
-                </div>
-                <button
-                  class="btn btn-info mt-2"
-                  type="submit"
-                  onClick={handleLogin}
-                >
-                  Log In
-                </button>
-              </form>
-              <p class="mt-3 mb-0">
-                <a class="text-info small" href="/">
-                  Forgot your email or password?
-                </a>
-              </p>
-            </div>
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{
+        height: "100vh",
+        backgroundImage: showBackground ? `url(${bg})` : "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundColor: showBackground ? "transparent" : "#f8f9fa",
+      }}
+    >
+      <div className={`container${showBackground ? "" : "d-flex"}`}>
+        <div className="row">
+          <div className="col-lg-6 d-none d-lg-block">
+            {!showBackground && (
+              <img
+                src={bg}
+                alt="Background"
+                className="img-fluid"
+                style={{ borderRadius: "1rem" }}
+              />
+            )}
           </div>
-          <div
-            class="col-lg-6 d-flex align-items-end"
-            id="bg-block"
-            style={{
-              backgroundImage: require("../assets/bg.jpg"),
-              backgroundSize: "cover",
-              backgroundPosition: "center center",
-            }}
-          >
-            <p class="ml-auto small text-dark mb-2">
-              <em>Photo by&nbsp;</em>
-              <a
-                class="text-dark"
-                href="https://unsplash.com/photos/v0zVmWULYTg?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <em>Aldain Austria</em>
-              </a>
-              <br />
-            </p>
+          <div className="col-lg-6 col-md-12 d-flex justify-content-center align-items-center">
+            <Card style={{ width: "90%", height: "auto" }}>
+              <Card.Body>
+                <Form>
+                  <Form.Group controlId="formUsername">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter username"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      style={{ marginTop: "1rem", marginBottom: "1rem" }}
+                    />
+                  </Form.Group>
+
+                  <Form.Group controlId="formPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      style={{ marginTop: "1rem", marginBottom: "1rem" }}
+                    />
+                  </Form.Group>
+
+                  <Button variant="primary" onClick={handleLogin}>
+                    Login
+                  </Button>
+                  <Button variant="link">Register</Button>
+                </Form>
+              </Card.Body>
+            </Card>
           </div>
         </div>
       </div>
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Login Error</Modal.Title>
+          <Modal.Title>Error</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Invalid username or password. Please try again.</Modal.Body>
+        <Modal.Body>{modalMessage}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="danger" onClick={closeModal}>
             Close
           </Button>
         </Modal.Footer>
       </Modal>
-      <script src={require("../assets/js/jquery.min.js")} />
     </div>
   );
-}
+};
 
 export default Login;
