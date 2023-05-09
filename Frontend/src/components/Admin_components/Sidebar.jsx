@@ -85,7 +85,7 @@ export default function AdminSidebar() {
             </MenuItem>
           </SubMenu>
           <SubMenu icon={<StoreIcon />} label="Manage Restaurant">
-            <MenuItem icon={<StoreOutlinedIcon />} component={<Link to="/admin/restaurant-list"/>}>My Restaurants</MenuItem>
+            <MenuItem icon={<StoreOutlinedIcon />} component={<Link to="/admin/"/>}>My Restaurants</MenuItem>
             <MenuItem
               icon={<AddBusinessOutlinedIcon />}
               component={<Link to="/admin/add-restaurant" />}
