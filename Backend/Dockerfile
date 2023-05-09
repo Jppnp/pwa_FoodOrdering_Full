@@ -5,13 +5,13 @@ ENV GO111MODULE=on \
 
 WORKDIR /app
 
+# Install reflex for hot reloading
+RUN go install github.com/cosmtrek/air@latest
+
 
 COPY ["go.mod", "go.sum", "./"]
 RUN go mod download
 
 COPY . /app
-RUN go get github.com/githubnemo/CompileDaemon
-RUN go install github.com/githubnemo/CompileDaemon
 
 
-ENTRYPOINT CompileDaemon -build="go build -o /build/app" -command="/build/app"

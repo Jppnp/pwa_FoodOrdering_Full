@@ -36,7 +36,7 @@ services:
       - /bin/sh
       - -c
       - |
-        go run main.go
+        air
         tail -f /dev/null
 
   web:
