@@ -1,14 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
 // import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 // import reportWebVitals from './reportWebVitals';
-import swDev from './swDev';
+import swDev from "./swDev";
+import { ProSidebarProvider } from "react-pro-sidebar";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
+  <ProSidebarProvider>
     <App />
+  </ProSidebarProvider>
 );
 
 // If you want your app to work offline and load faster, you can change

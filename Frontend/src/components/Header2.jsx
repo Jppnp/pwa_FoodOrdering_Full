@@ -1,6 +1,8 @@
-import React from 'react';
+import React from "react";
 import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import Logout from "./Logout";
+
 export default function Header2() {
   return (
     <Navbar
@@ -8,44 +10,52 @@ export default function Header2() {
       expand="sm"
       bg="dark"
       variant="dark"
-      style={{ marginBottom: "1rem", padding: "1rem" }}
+      style={{
+        marginBottom: "1rem",
+        padding: "1rem",
+        display: "flex",
+        justifyContent: "space-between",
+      }}
     >
       <Container>
-        <Navbar.Brand href="/">
+        <Navbar.Brand href="/client/">
           <img
             alt=""
-            src={require('../assets/profile2.png')}
+            src={require("../assets/profile2.png")}
             width="30"
             height="30"
             className="d-inline-block align-top"
-            style={{marginRight: '1rem'}}
+            style={{ marginRight: "1rem" }}
           />
-          <span>ยินดีต้อนรับ, สมชาย ภัคดีมาก</span>
-          </Navbar.Brand>
+          <span>ยินดีต้อนรับ, สมชาย ภัคดี</span>
+        </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="navbarScroll"
           data-bs-target="#navbarScrll"
         />
         <Navbar.Collapse id="navbarScroll">
-          <Nav className="me-auto" style={{textAlign:'left'}}>
-            <NavLink eventKey="3" as={Link} to="/menu">
+          <Nav className="me-auto" style={{ textAlign: "left" }}>
+            <NavLink as={Link} to="/client/menu">
               Menu
             </NavLink>
-            <NavLink eventKey="5" as={Link} to="/restaurants">
+            <NavLink as={Link} to="/client/restaurants">
               Restaurants
             </NavLink>
-            <NavLink eventKey="6" as={Link} to="/cart">
+            <NavLink as={Link} to="/client/cart">
               Cart
             </NavLink>
-            <NavLink eventKey="7" as={Link} to="/history ">
+            <NavLink as={Link} to="/client/history ">
               History
             </NavLink>
-            <NavLink eventKey="8" as={Link} to="/notification ">
+            <NavLink as={Link} to="/client/notification ">
               Notification
             </NavLink>
           </Nav>
         </Navbar.Collapse>
       </Container>
+      <Nav>
+        <Nav.Link as={Logout} />
+      </Nav>
     </Navbar>
   );
 }

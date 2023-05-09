@@ -101,7 +101,7 @@ export default function Menus() {
                   .map((item) => (
                     <Col key={item.id} xs={12} md={6}>
                       <Link
-                        to={"/order"}
+                        to={`/client/menu/${item.id}`}
                         state={{ selectedMenu: item }}
                         style={{ color: "#000" }}
                       >
