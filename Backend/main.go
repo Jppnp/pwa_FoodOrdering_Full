@@ -15,7 +15,7 @@ func main() {
 	// Enable CORS
 	router.Use(cors.Default())
 
-	routes.UserRoute(router)
+	routes.SetupRoutes(router)
 
 	router.Run(":8000")
 }
