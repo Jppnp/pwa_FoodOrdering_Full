@@ -10,7 +10,7 @@ type User struct {
 }
 
 type Merchant struct {
-	Id       int    `json:"id" gorm:"primary_key"`
+	Id       int    `json:"id" gorm:"primary_key;autoIncrement"`
 	Fname    string `json:"fname"`
 	Lname    string `json:"lname"`
 	Email    string `json:"email"`
@@ -19,7 +19,7 @@ type Merchant struct {
 }
 
 type Restaurant struct {
-	Id   int    `json:"id" gorm:"primary_key"`
+	Id   int    `json:"id" gorm:"primary_key;autoIncrement"`
 	Name string `json:"name"`
 }
 
@@ -31,7 +31,7 @@ type Admin struct {
 }
 
 type Restaurant_Location struct {
-	LID        int        `json:"lid" gorm:"primary_key"`
+	LID        int        `json:"lid" gorm:"primary_key;autoIncrement"`
 	RID        int        `json:"rid" gorm:"primary_key;foreignkey:Id"`
 	Restaurant Restaurant `json:"restaurant" gorm:"foreignkey:RID"`
 }
