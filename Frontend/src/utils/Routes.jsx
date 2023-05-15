@@ -18,6 +18,9 @@ import AddRestaurant from "../components/Admin_components/AddRestaurant";
 import AddMerchant from "../components/Admin_components/AddMerchant";
 import EmployeeList from "../components/Admin_components/EmployeeList";
 import ShowRestaurantList from "../components/Admin_components/ShowRestaurantList";
+import AddNewRestaurant from "../components/Admin_components/AddNewRestaurant";
+import AddRestaurantBranch from "../components/Admin_components/AddRestaurantBranch";
+import ShowBranchList from "../components/Admin_components/ShowBranchList";
 
 export function ClientRoutes() {
   const location = useLocation();
@@ -53,10 +56,19 @@ export function AdminRoutes() {
           <Routes>
             <Route element={<PrivateRoute role="admin" />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="add-restaurant" element={<AddRestaurant />} />
+              <Route path="add-restaurant" element={<AddNewRestaurant />} />
               <Route path="add-merchant" element={<AddMerchant />} />
               <Route path="employee-list" element={<EmployeeList />} />
               <Route path="restaurant-list" element={<ShowRestaurantList />} />
+              <Route path="restaurant/:id" element={<AddRestaurant />} />
+              <Route
+                path="restaurant/add-location/:restaurantId/:restaurantName"
+                element={<AddRestaurantBranch />}
+              />
+              <Route
+                path="restaurant/locations/:restaurantId/:restaurantName"
+                element={<ShowBranchList />}
+              />
             </Route>
           </Routes>
         </div>

@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import CustomModal from "../CustomModal";
 
-const RestaurantCard = ({ restaurant, onEdit, onDelete }) => {
-  const { id, name, address, latitude, longitude } = restaurant;
+const RestaurantCard = ({ restaurant, onEdit, onDelete, onSee }) => {
+  const { id, name } = restaurant;
 
   return (
     <Col md={6} lg={4} xl={3}>
       <Card style={{ marginBottom: "1rem" }} id={id}>
         <Card.Body>
           <Card.Title>{`${name}`}</Card.Title>
-          <Card.Text>
-            <strong>Address:</strong> {address}
-          </Card.Text>
-          <Card.Text>
-            <strong>Latitude:</strong> {latitude}
-          </Card.Text>
-          <Card.Text>
-            <strong>Longitude:</strong> {longitude}
-          </Card.Text>
-          <Button variant="primary" onClick={() => onEdit(restaurant)}>
+          <Button variant="primary" onClick={() => onSee(restaurant)}>
+            Branch
+          </Button>{" "}
+          <Button variant="warning" onClick={() => onEdit(restaurant)}>
             Edit
           </Button>{" "}
           <Button variant="danger" onClick={() => onDelete(restaurant)}>
@@ -31,44 +28,101 @@ const RestaurantCard = ({ restaurant, onEdit, onDelete }) => {
 };
 
 const ShowRestaurantList = () => {
-  const restaurants = [
-    {
-      id: 1,
-      name: "ร้านที่ 1",
-      address: "ตำแหน่งเอ ",
-      latitude: "70.13234",
-      longitude: "123.3421",
-    },
-    {
-        id: 2,
-        name: "ร้านที่ 2",
-        address: "ตำแหน่งบี  ",
-        latitude: "28.3132",
-        longitude: "51.3142",
-      },
-  ];
+  const [restaurants, setRestaurants] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [restaurantToDelete, setRestaurantToDelete] = useState(null);
+  const navigate = useNavigate();
+
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_BASE_URL,
+  });
+
+  useEffect(() => {
+    api
+      .get("restaurants")
+      .then((response) => {
+        if (response.data !== null) {
+          setRestaurants(response.data);
+        }
+      })
+      .catch((err) => {
+        setShowDeleteModal(false);
+      });
+  }, []);
+  console.log(`Restaurant lenght: ${restaurants.length > 0}`);
+
+  const handleSee = (restaurant) => {
+    navigate(
+      `/admin/restaurant/locations/${restaurant.id}/${restaurant.name}`
+    );
+    console.log("See", restaurant);
+  };
 
   const handleEdit = (restaurant) => {
-    // Handle edit action
     console.log("Edit", restaurant);
   };
 
   const handleDelete = (restaurant) => {
-    // Handle delete action
-    console.log("Delete", restaurant);
+    setRestaurantToDelete(restaurant);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = (accepted) => {
+    setShowDeleteModal(false);
+    if (accepted && restaurantToDelete) {
+      api
+        .delete(`restaurants/${restaurantToDelete.id}`)
+        .then((response) => {
+          setShowSuccessModal(true);
+        })
+        .catch((err) => {
+          setShowSuccessModal(false);
+        });
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    window.location.reload();
   };
 
   return (
-    <Row>
-      {restaurants.map((restaurant) => (
-        <RestaurantCard
-          key={restaurant.id}
-          restaurant={restaurant}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+    <div>
+      <Row>
+        {restaurants.length > 0 ? (
+          restaurants.map((restaurant) => (
+            <RestaurantCard
+              key={restaurant.id}
+              restaurant={restaurant}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onSee={handleSee}
+            />
+          ))
+        ) : (
+          <h1>No restaurants in the system</h1>
+        )}
+      </Row>
+      {showDeleteModal && (
+        <CustomModal
+          modalTitle="Confirmation"
+          message={`Are you sure you want to delete ${restaurantToDelete?.name}?`}
+          isAccept={handleConfirmDelete}
+          needConfirm={true}
+          show={showDeleteModal}
         />
-      ))}
-    </Row>
+      )}
+      {showSuccessModal && (
+        <CustomModal
+          modalTitle="Success"
+          message={`Restaurant deleted successfully`}
+          isAccept={handleSuccessModalClose}
+          needConfirm={false}
+          show={showSuccessModal}
+        />
+      )}
+    </div>
   );
 };
 
