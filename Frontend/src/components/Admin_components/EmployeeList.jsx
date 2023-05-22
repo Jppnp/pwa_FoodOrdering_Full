@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-});
+import { api } from "../../utils/UserControl";
 
 const MerchantCard = ({ merchant, onEdit, onDelete }) => {
   const { fname, lname, email, restaurant_location_id, role } = merchant;

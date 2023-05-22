@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Modal, Image } from "react-bootstrap";
-import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-});
+import { api } from "../../utils/UserControl";
 
 const restaurant = JSON.parse(localStorage.getItem("restaurant"))
 

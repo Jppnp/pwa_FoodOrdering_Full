@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CustomModal from "../CustomModal";
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-});
+import { api } from "../../utils/UserControl";
 
 const RestaurantCard = ({ restaurant, onEdit, onDelete, onSee }) => {
   const { id, name } = restaurant;

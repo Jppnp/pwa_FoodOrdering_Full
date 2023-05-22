@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import CustomModal from "../CustomModal";
+import { api } from "../../utils/UserControl";
 
 const AddRestaurantBranch = () => {
   const { restaurantId, restaurantName } = useParams();
@@ -15,9 +15,6 @@ const AddRestaurantBranch = () => {
   const navigate = useNavigate();
   
   
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_BASE_URL,
-  });
 
   const handleSubmit = (e) => {
     e.preventDefault();

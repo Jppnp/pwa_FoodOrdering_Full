@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -8,54 +8,27 @@ import {
   FormControl,
 } from "react-bootstrap";
 import { Tab } from "semantic-ui-react";
-import { Link } from "react-router-dom";
-
+import { Link, useParams } from "react-router-dom";
+import { api } from "../utils/UserControl";
 
 export default function Menus() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const menuItems = [
-    {
-      id: 1,
-      name: "Spaghetti Carbonara!",
-      description: "Spaghetti with bacon, eggs, and Parmesan cheese",
-      price: 12.99,
-      image: require("../assets/profile.webp"),
-      category: "food",
-    },
-    {
-      id: 2,
-      name: "Grilled Salmon",
-      description:
-        "Grilled salmon with lemon butter sauce and roasted vegetables",
-      price: 18.99,
-      image: require("../assets/food.webp"),
-      category: "food",
-    },
-    {
-      id: 3,
-      name: "New York Cheesecake",
-      description:
-        "Creamy cheesecake with graham cracker crust and raspberry sauce",
-      price: 7.99,
-      image: require("../assets/food.webp"),
-      category: "food",
-    },
-    {
-      id: 4,
-      name: "Lemon Soda",
-      description: "Lemon with soda and sugar",
-      price: 1.24,
-      image: require("../assets/food.webp"),
-      category: "drink",
-    },
-  ];
+  const [menuItems, setMenuItems] = useState([]);
+  const { rid } = useParams();
+
+  useEffect(() => {
+    api.get(`menus/location/${rid}`).then((res) => {
+      setMenuItems(res.data)
+    }).catch(err => {
+      console.log(`error get menu: ${err}`)
+    })
+  }, [rid]);
 
   const categories = [
     "All",
     ...new Set(menuItems.map((item) => item.category)),
   ];
-  console.log(categories);
 
   const handleTabChange = (e, { activeIndex }) => {
     setActiveCategory(categories[activeIndex]);
@@ -101,7 +74,7 @@ export default function Menus() {
                   .map((item) => (
                     <Col key={item.id} xs={12} md={6}>
                       <Link
-                        to={`/client/menu/${item.id}`}
+                        to={`/client/menus/${rid}/${item.id}`}
                         state={{ selectedMenu: item }}
                         style={{ color: "#000" }}
                       >
@@ -119,7 +92,7 @@ export default function Menus() {
                               style={{ padding: "20px 10px 20px 25px" }}
                             >
                               <Card.Img
-                                src={item.image}
+                                src={item.image_path}
                                 alt={item.name}
                                 style={{ width: "130px", height: "100px" }}
                               />
@@ -128,7 +101,7 @@ export default function Menus() {
                               <Card.Body>
                                 <Card.Title>{item.name}</Card.Title>
                                 <Card.Text>{item.description}</Card.Text>
-                                <Card.Text>${item.price}</Card.Text>
+                                <Card.Text>{item.price} ฿</Card.Text>
                               </Card.Body>
                             </Col>
                           </Row>

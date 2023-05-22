@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import axios from "axios";
 import CustomModal from "../CustomModal";
 import { useNavigate } from "react-router-dom";
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-});
+import { api } from "../../utils/UserControl";
 
 const AddMerchant = () => {
   const [firstName, setFirstName] = useState("");

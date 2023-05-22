@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomModal from "../CustomModal";
-
-const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
-});
+import { api } from "../../utils/UserControl";
 
 const BranchCard = ({ branch, onDelete }) => {
   const { id, name, address, lat, lng } = branch;

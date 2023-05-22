@@ -1,29 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, InputGroup, FormControl } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { api } from "../utils/UserControl";
+
+const RestaurantCard = ({ restaurant }) => {
+  const { id, name, address, restaurant_id } = restaurant;
+
+  const [mainRestaurant, setMainRestaurant] = useState("");
+  useEffect(() => {
+    api
+      .get(`/restaurants/${restaurant_id}`)
+      .then((res) => {
+        setMainRestaurant(res.data);
+      })
+      .catch((err) => {
+        console.log(`error while get main restaurant ${err}`);
+      });
+  }, [restaurant_id]);
+
+  return (
+    <Link to={`/client/menus/${id}`} style={{ color: "#000" }}>
+      <Card style={{ width: "18rem", margin: "1rem" }}>
+        <Card.Body>
+          <Card.Title>
+            {mainRestaurant.name} <br />{" "}
+            <span style={{ color: "#004d39" }}>สาขา {name}</span>
+          </Card.Title>
+          <Card.Text>{address}</Card.Text>
+          <Card.Subtitle>Distance: km</Card.Subtitle>
+        </Card.Body>
+      </Card>
+    </Link>
+  );
+};
 
 const RestaurantList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const restaurants = [
-    {
-      id: 1,
-      name: "Italiano Pizzeria",
-      address: "123 Main St",
-      distance: 2.5,
-    },
-    {
-      id: 2,
-      name: "Mama Mia Restaurant",
-      address: "456 Elm St",
-      distance: 3.2,
-    },
-    {
-      id: 3,
-      name: "Thai Garden",
-      address: "789 Oak St",
-      distance: 4.1,
-    },
-  ];
+  const [restaurants, setRestaurants] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("restaurant/locations")
+      .then((res) => {
+        setRestaurants(res.data);
+      })
+      .catch((err) => {
+        console.log(`Error get restaurant: ${err}`);
+      });
+  }, []);
 
   const filteredRestaurants = restaurants.filter((restaurant) =>
     restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -47,22 +71,7 @@ const RestaurantList = () => {
       </InputGroup>
       <div className="d-flex flex-wrap justify-content-center">
         {filteredRestaurants.map((restaurant) => (
-          <Link
-            to={`/menu`}
-            key={restaurant.id}
-            style={{ color: "#000" }}
-          >
-            {/* <Link to={`/restaurant/${restaurant.id}`} key={restaurant.id} style={{color: '#000'}}></Link> */}
-            <Card style={{ width: "18rem", margin: "1rem" }}>
-              <Card.Body>
-                <Card.Title>{restaurant.name}</Card.Title>
-                <Card.Text>{restaurant.address}</Card.Text>
-                <Card.Subtitle>
-                  Distance: {restaurant.distance} km
-                </Card.Subtitle>
-              </Card.Body>
-            </Card>
-          </Link>
+          <RestaurantCard restaurant={restaurant} key={restaurant.id}/>
         ))}
       </div>
     </div>

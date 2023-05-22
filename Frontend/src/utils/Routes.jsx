@@ -1,7 +1,6 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 // Client Component
-import Home from "../components/Home";
 import PrivateRoute from "./PrivateRoute";
 import Header2 from "../components/Header2";
 import RestaurantList from "../components/RestaurantList";
@@ -28,18 +27,14 @@ import MenuList from "../components/Merchan_components/ShowMenus";
 import AddMenu from "../components/Merchan_components/AddMenu";
 
 export function ClientRoutes() {
-  const location = useLocation();
-  const shouldShowHeader = location.pathname !== "/login";
-
   return (
     <div>
-      {shouldShowHeader && <Header2 />}
+      <Header2 />
       <Routes>
         <Route element={<PrivateRoute role="client" />}>
-          <Route index element={<Home />} />
-          <Route path="menu" element={<Menus />} />
-          <Route path="restaurants" element={<RestaurantList />} />
-          <Route path="menu/:id" element={<OrderForm />} />
+          <Route index element={<RestaurantList />} />
+          <Route path="menus/:rid" element={<Menus />} />
+          <Route path="menus/:rid/:id" element={<OrderForm />} />
           <Route path="cart" element={<Cart />} />
           <Route path="history" element={<OrderHistory />} />
           <Route path="notification" element={<Notification />} />
