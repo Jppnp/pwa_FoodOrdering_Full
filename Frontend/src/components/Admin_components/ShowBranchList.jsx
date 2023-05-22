@@ -4,8 +4,12 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomModal from "../CustomModal";
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
+
 const BranchCard = ({ branch, onDelete }) => {
-  const { id, name, address, latitude, longitude } = branch;
+  const { id, name, address, lat, lng } = branch;
 
   return (
     <Col md={6} lg={4} xl={3}>
@@ -13,8 +17,8 @@ const BranchCard = ({ branch, onDelete }) => {
         <Card.Body>
           <Card.Title>{`${name}`}</Card.Title>
           <Card.Text>{`Address: ${address}`}</Card.Text>
-          <Card.Text>{`Latitude: ${latitude}`}</Card.Text>
-          <Card.Text>{`Longitude: ${longitude}`}</Card.Text>
+          <Card.Text>{`Latitude: ${lat}`}</Card.Text>
+          <Card.Text>{`Longitude: ${lng}`}</Card.Text>
           <Button variant="danger" onClick={() => onDelete(branch)}>
             Delete
           </Button>
@@ -32,10 +36,6 @@ const ShowBranchList = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_BASE_URL,
-  });
-
   useEffect(() => {
     // Fetch branches for the given restaurant
     if (restaurantId) {
@@ -50,9 +50,7 @@ const ShowBranchList = () => {
           console.log(error);
         });
     }
-  }, []);
-
-
+  }, [restaurantId]);
 
   const handleDelete = (branch) => {
     setBranchToDelete(branch);
@@ -63,7 +61,7 @@ const ShowBranchList = () => {
     setShowDeleteModal(false);
     if (accepted && branchToDelete) {
       api
-        .delete(`restaurant/locations/${restaurantId}/${branchToDelete.id}`)
+        .delete(`restaurant/locations/${branchToDelete.id}`)
         .then((response) => {
           setShowSuccessModal(true);
           setBranches(branches.filter((b) => b.id !== branchToDelete.id));
@@ -86,7 +84,10 @@ const ShowBranchList = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-end">
+      <div
+        className="d-flex justify-content-end"
+        style={{ marginBottom: `1rem` }}
+      >
         <Button variant="success" onClick={handleAddBranch}>
           + Add New Branch
         </Button>

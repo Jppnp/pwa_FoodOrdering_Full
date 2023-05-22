@@ -7,17 +7,19 @@ export default function CustomModal({modalTitle, message, isAccept, needConfirm,
   const title = modalTitle || "Error";
 
   const cancelModal = () => {
+    console.log("Cancel CustomModal")
     setShowModal(false);
     isAccept(false)
   };
 
   const acceptModal = () => {
+    console.log("Accept CustomModal")
     setShowModal(false);
     isAccept(true)
   };
 
   return (
-    <Modal show={showModal} onHide={cancelModal}>
+    <Modal show={showModal}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

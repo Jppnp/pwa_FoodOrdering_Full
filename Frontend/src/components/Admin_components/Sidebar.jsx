@@ -73,7 +73,7 @@ export default function AdminSidebar() {
           <SubMenu icon={<ManageAccountsIcon />} label="Manage Merchant">
             <MenuItem
               icon={<PeopleOutlinedIcon />}
-              component={<Link to="/admin/employee-list" />}
+              component={<Link to="/admin/merchants" />}
             >
               Merchants
             </MenuItem>

@@ -4,6 +4,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CustomModal from "../CustomModal";
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
+
 const RestaurantCard = ({ restaurant, onEdit, onDelete, onSee }) => {
   const { id, name } = restaurant;
 
@@ -34,10 +38,6 @@ const ShowRestaurantList = () => {
   const [restaurantToDelete, setRestaurantToDelete] = useState(null);
   const navigate = useNavigate();
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_BASE_URL,
-  });
-
   useEffect(() => {
     api
       .get("restaurants")
@@ -50,12 +50,10 @@ const ShowRestaurantList = () => {
         setShowDeleteModal(false);
       });
   }, []);
-  console.log(`Restaurant lenght: ${restaurants.length > 0}`);
+  console.log(`Restaurant : ${JSON.stringify(restaurants)}`);
 
   const handleSee = (restaurant) => {
-    navigate(
-      `/admin/restaurant/locations/${restaurant.id}/${restaurant.name}`
-    );
+    navigate(`/admin/restaurant/locations/${restaurant.id}/${restaurant.name}`);
     console.log("See", restaurant);
   };
 

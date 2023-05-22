@@ -16,11 +16,16 @@ import AdminDashboard from "../components/Admin_components/Dashboard";
 import AdminSidebar from "../components/Admin_components/Sidebar";
 import AddRestaurant from "../components/Admin_components/AddRestaurant";
 import AddMerchant from "../components/Admin_components/AddMerchant";
-import EmployeeList from "../components/Admin_components/EmployeeList";
+import MerchantList from "../components/Admin_components/EmployeeList";
 import ShowRestaurantList from "../components/Admin_components/ShowRestaurantList";
 import AddNewRestaurant from "../components/Admin_components/AddNewRestaurant";
 import AddRestaurantBranch from "../components/Admin_components/AddRestaurantBranch";
 import ShowBranchList from "../components/Admin_components/ShowBranchList";
+// Merchant component
+import MerchantSidebar from "../components/Merchan_components/MerchantSidebar";
+import MerchantDashboard from "../components/Merchan_components/Dashboard";
+import MenuList from "../components/Merchan_components/ShowMenus";
+import AddMenu from "../components/Merchan_components/AddMenu";
 
 export function ClientRoutes() {
   const location = useLocation();
@@ -58,7 +63,7 @@ export function AdminRoutes() {
               <Route index element={<AdminDashboard />} />
               <Route path="add-restaurant" element={<AddNewRestaurant />} />
               <Route path="add-merchant" element={<AddMerchant />} />
-              <Route path="employee-list" element={<EmployeeList />} />
+              <Route path="merchants" element={<MerchantList />} />
               <Route path="restaurant-list" element={<ShowRestaurantList />} />
               <Route path="restaurant/:id" element={<AddRestaurant />} />
               <Route
@@ -69,6 +74,27 @@ export function AdminRoutes() {
                 path="restaurant/locations/:restaurantId/:restaurantName"
                 element={<ShowBranchList />}
               />
+            </Route>
+          </Routes>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function MerchantRoutes() {
+  return (
+    <div>
+      <div style={{ display: "flex" }}>
+        <div style={{ flex: "1" }}>
+          <MerchantSidebar />
+        </div>
+        <div style={{ flex: "5", margin: "1rem" }}>
+          <Routes>
+            <Route element={<PrivateRoute role="merchant" />}>
+              <Route index element={<MerchantDashboard />} />
+              <Route path="foods" element={<MenuList />} />
+              <Route path="foods/add" element={<AddMenu />} />
             </Route>
           </Routes>
         </div>

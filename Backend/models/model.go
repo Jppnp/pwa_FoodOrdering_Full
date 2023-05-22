@@ -1,37 +1,79 @@
 package models
 
-type User struct {
-	Id       int    `json:"id" gorm:"primary_key"`
-	Username string `json:"username"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Phone    string `json:"phone"`
-}
+import (
+	"time"
+)
 
 type Merchant struct {
-	Id       int    `json:"id" gorm:"primary_key;autoIncrement"`
-	Fname    string `json:"fname"`
-	Lname    string `json:"lname"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	ID                   uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	FName                string `json:"fname"`
+	LName                string `json:"lname"`
+	Email                string `json:"email"`
+	Password             string `json:"password"`
+	Role                 string `json:"role"`
+	RestaurantLocationID uint   `json:"restaurant_location_id"`
 }
-
 type Restaurant struct {
-	Id   int    `json:"id" gorm:"primary_key;autoIncrement"`
-	Name string `json:"name"`
+	ID                  uint                 `json:"id" gorm:"primaryKey"`
+	Name                string               `json:"name" gorm:"not null"`
+	RestaurantLocations []RestaurantLocation `gorm:"foreignKey:RestaurantID"`
 }
 
-type Admin struct {
-	MID        int        `json:"mid" gorm:"primary_key;foreignkey:Id"`
-	RID        int        `json:"rid" gorm:"primary_key;foreignkey:Id"`
-	Merchant   Merchant   `json:"merchant" gorm:"foreignkey:MID"`
-	Restaurant Restaurant `json:"restaurant" gorm:"foreignkey:RID"`
+type RestaurantLocation struct {
+	ID           uint    `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name         string  `json:"name"`
+	Address      string  `json:"address"`
+	Lat          float64 `json:"lat"`
+	Lng          float64 `json:"lng"`
+	RestaurantID uint    `json:"restaurant_id" gorm:"not null"`
+	Menus        []Menu  `gorm:"foreignKey:RestaurantLocationID"`
+	Orders       []Order `gorm:"foreignKey:RestaurantLocationID"`
 }
 
-type Restaurant_Location struct {
-	LID        int        `json:"lid" gorm:"primary_key;autoIncrement"`
-	RID        int        `json:"rid" gorm:"primary_key;foreignkey:Id"`
-	Restaurant Restaurant `json:"restaurant" gorm:"foreignkey:RID"`
+type Menu struct {
+	ID                   uint    `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name                 string  `json:"name"`
+	Description          string  `json:"description"`
+	Price                float64 `json:"price"`
+	Category             string  `json:"category"`
+	ImagePath            string  `json:"image_path"`
+	RestaurantLocationID uint    `json:"restaurant_location_id"`
+}
+type Order struct {
+	ID                   uint        `gorm:"primaryKey;autoIncrement" json:"id"`
+	Status               string      `json:"status"`
+	RestaurantLocationID uint        `gorm:"not null"`
+	OrderItems           []OrderItem `gorm:"foreignKey:OrderID" json:"orderItems"`
+	CustomerID           uint        `json:"-"`
+	Customer             *Customer   `json:"customer"`
+}
+
+type OrderItem struct {
+	ID       uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	OrderID  uint   `json:"order_id" gorm:"not null"`
+	Order    Order  `gorm:"foreignKey:OrderID"`
+	MenuID   uint   `json:"menu_id" gorm:"not null"`
+	Menu     Menu   `gorm:"foreignKey:MenuID"`
+	Note     string `json:"note"`
+	Quantity uint   `json:"quantity"`
+}
+
+type Customer struct {
+	ID       uint    `gorm:"primaryKey;autoIncrement" json:"id"`
+	FName    string  `json:"fname"`
+	LName    string  `json:"lname"`
+	Email    string  `json:"email"`
+	Phone    string  `json:"phone"`
+	Password string  `json:"-"`
+	Orders   []Order `json:"orders"`
+}
+
+type Payment struct {
+	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Type    string    `json:"type"`
+	Status  string    `json:"status"`
+	Amount  float64   `json:"amount"`
+	Date    time.Time `json:"date"`
+	OrderID uint      `json:"-"`
+	Order   Order     `json:"order"`
 }

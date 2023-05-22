@@ -29,11 +29,11 @@ const AddRestaurantBranch = () => {
     setShowModal(false);
     if (accepted) {
       const newBranch = {
+        name: branchName,
         address: address,
         lat: parseFloat(latitude),
         lng: parseFloat(longitude),
         restaurant_id: parseInt(restaurantId, 10),
-        name: branchName,
       };
 
       console.log(`new Branch : ${JSON.stringify(newBranch)}`);
@@ -41,14 +41,13 @@ const AddRestaurantBranch = () => {
       api
         .post("/restaurant/locations", JSON.stringify(newBranch))
         .then((response) => {
-          response.status === 200
+          response.status === 201
             ? setShowModalGo(true)
             : console.log(
                 `Error response to post new Branch: ${response.message}`
               );
         })
         .catch((error) => {
-          console.log(`Error  Message: ${error.data === "error"}`);
           console.log(error);
         });
     }

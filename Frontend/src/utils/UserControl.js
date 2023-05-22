@@ -1,3 +1,8 @@
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
 export function userLogin(uid, userRole) {
   const user = {
     id: uid,
@@ -23,4 +28,21 @@ export function getRole() {
 
 export function userLogout() {
   localStorage.removeItem("userData");
+}
+
+export function merchantLogout() {
+  localStorage.removeItem("userData");
+  localStorage.removeItem("Restaurant");
+}
+
+export async function merchantLogin(uid, userRole, restaurant_location_id) {
+  try {
+    const locationResponse = await api.get(
+      `/restaurant/locations/location/${restaurant_location_id}`
+    );
+    localStorage.setItem("restaurant", JSON.stringify(locationResponse.data));
+    localStorage.setItem("userData", JSON.stringify({ id: uid, role: userRole }));
+  } catch (error) {
+    console.log("Error While merchant login ", error)
+  }
 }

@@ -4,71 +4,105 @@ import (
 	"net/http"
 	"pwaV3/config"
 	"pwaV3/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type MerchantController struct{}
 
-func (mc *MerchantController) AddMerchant(c *gin.Context) {
+func (mc *MerchantController) GetMerchants(c *gin.Context) {
+	var merchants []models.Merchant
+	if err := config.DB.Find(&merchants).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get merchants"})
+		return
+	}
+	c.JSON(http.StatusOK, merchants)
+}
+
+func (me *MerchantController) GetMerChantByEmail(c *gin.Context) {
+	email := c.Param("email")
 	var merchant models.Merchant
-	c.BindJSON(&merchant)
-	config.DB.Create(&merchant)
-	c.JSON(200, &merchant)
+	if err := config.DB.Where("email = ?", email).First(&merchant).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found user invalid email"})
+		return
+	}
+	c.JSON(http.StatusOK, merchant)
 }
 
-func (mc *MerchantController) GetAllMerchant(c *gin.Context) {
-	merchants := []models.Merchant{}
-	config.DB.Find(&merchants)
-	c.IndentedJSON(http.StatusOK, &merchants)
-}
+func (mc *MerchantController) GetMerchantByID(c *gin.Context) {
+	merchantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid merchant ID"})
+		return
+	}
 
-func (mc *MerchantController) GetMerchantById(c *gin.Context) {
 	var merchant models.Merchant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).Find(&merchant)
-	c.IndentedJSON(http.StatusOK, &merchant)
+	if err := config.DB.First(&merchant, merchantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "merchant not found"})
+		return
+	}
+	c.JSON(http.StatusOK, merchant)
 }
 
+func (mc *MerchantController) CreateMerchant(c *gin.Context) {
+	var merchant models.Merchant
+	if err := c.ShouldBindJSON(&merchant); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid merchant data"})
+		return
+	}
+
+	// Create the merchant in the database
+	if err := config.DB.Create(&merchant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create merchant"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, merchant)
+}
 func (mc *MerchantController) UpdateMerchant(c *gin.Context) {
+	merchantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid merchant ID"})
+		return
+	}
+
 	var merchant models.Merchant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).First(&merchant)
-	c.BindJSON(&merchant)
-	config.DB.Save(&merchant)
-	c.IndentedJSON(http.StatusOK, &merchant)
+	if err := config.DB.First(&merchant, merchantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "merchant not found"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&merchant); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid merchant data"})
+		return
+	}
+
+	if err := config.DB.Save(&merchant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update merchant"})
+		return
+	}
+
+	c.JSON(http.StatusOK, merchant)
 }
 
 func (mc *MerchantController) DeleteMerchant(c *gin.Context) {
+	merchantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid merchant ID"})
+		return
+	}
+
 	var merchant models.Merchant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).Delete(&merchant)
-	c.JSON(200, &merchant)
-}
+	if err := config.DB.First(&merchant, merchantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "merchant not found"})
+		return
+	}
 
-type AdminController struct{}
+	if err := config.DB.Delete(&merchant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete merchant"})
+		return
+	}
 
-func (am *AdminController) AddAdmin(c *gin.Context) {
-	var admin models.Admin
-	c.BindJSON(&admin)
-	config.DB.Create(&admin)
-	c.IndentedJSON(http.StatusOK, &admin)
-}
-
-func (am *AdminController) UpdateAdmin(c *gin.Context) {
-	var admin models.Admin
-	rid := c.Param("rid")
-	mid := c.Param("mid")
-	config.DB.Where("rid = ? && mid = ?", rid, mid).First(&admin)
-	c.BindJSON(&admin)
-	config.DB.Save(&admin)
-	c.IndentedJSON(http.StatusOK, &admin)
-}
-
-func (am *AdminController) DeleteAdmin(c *gin.Context) {
-	var admin models.Admin
-	rid := c.Param("rid")
-	mid := c.Param("mid")
-	config.DB.Where("rid = ? && mid = ?", rid, mid).Delete(&admin)
-	c.IndentedJSON(http.StatusOK, &admin)
+	c.JSON(http.StatusOK, gin.H{"message": "merchant deleted"})
 }

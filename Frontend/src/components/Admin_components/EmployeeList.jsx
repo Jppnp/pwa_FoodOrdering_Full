@@ -1,27 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
+import axios from "axios";
 
-const EmployeeCard = ({ employee, onEdit, onDelete }) => {
-  const { firstName, lastName, phone, email, department } = employee;
+const api = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
+
+const MerchantCard = ({ merchant, onEdit, onDelete }) => {
+  const { fname, lname, email, restaurant_location_id, role } = merchant;
+  const [restaurant, setRestaurant] = useState(null);
+  const [location, setLocation] = useState(null);
+  
+  useEffect(() => {
+    const fetchRestaurantAndLocation = async () => {
+      try {
+        const locationResponse = await api.get(
+          `/restaurant/locations/location/${restaurant_location_id}`
+        );
+        const { restaurant_id } = locationResponse.data;
+
+        const restaurantResponse = await api.get(
+          `/restaurants/${restaurant_id}`
+        );
+
+        setRestaurant(restaurantResponse.data);
+        setLocation(locationResponse.data);
+      } catch (error) {
+        console.log("Error while fetching data:", error);
+      }
+    };
+
+    fetchRestaurantAndLocation();
+  }, [restaurant_location_id]);
 
   return (
     <Col md={6} lg={4} xl={3}>
       <Card style={{ marginBottom: "1rem" }}>
         <Card.Body>
-          <Card.Title>{`${firstName} ${lastName}`}</Card.Title>
-          <Card.Text>
-            <strong>Phone:</strong> {phone}
-          </Card.Text>
+          <Card.Title>{`${fname} ${lname}`}</Card.Title>
           <Card.Text>
             <strong>Email:</strong> {email}
           </Card.Text>
           <Card.Text>
-            <strong>Department:</strong> {department}
+            <strong>Role:</strong> {role}
           </Card.Text>
-          <Button variant="primary" onClick={() => onEdit(employee)}>
+          <Card.Text>
+            <strong>Work At:</strong> {restaurant?.name}
+          </Card.Text>
+          <Card.Text>
+            <strong>Branch:</strong> {location?.name}
+          </Card.Text>
+          <Button variant="primary" onClick={() => onEdit(merchant)}>
             Edit
           </Button>{" "}
-          <Button variant="danger" onClick={() => onDelete(employee)}>
+          <Button variant="danger" onClick={() => onDelete(merchant)}>
             Delete
           </Button>
         </Card.Body>
@@ -30,49 +62,50 @@ const EmployeeCard = ({ employee, onEdit, onDelete }) => {
   );
 };
 
-const EmployeeList = () => {
-  const employees = [
-    {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      phone: "123-456-7890",
-      email: "johndoe@example.com",
-      department: "Marketing",
-    },
-    {
-      id: 2,
-      firstName: "Jane",
-      lastName: "Smith",
-      phone: "987-654-3210",
-      email: "janesmith@example.com",
-      department: "Sales",
-    },
-    // Add more employee objects as needed
-  ];
+const MerchantList = () => {
+  const [merchants, setMerchants] = useState([]);
 
-  const handleEdit = (employee) => {
+  useEffect(() => {
+    const fetchMerchants = async () => {
+      try {
+        const response = await api.get("merchants");
+        setMerchants(response.data);
+      } catch (error) {
+        console.log("Error while fetching all merchants:", error);
+      }
+    };
+
+    fetchMerchants();
+  }, []);
+
+  const handleEdit = (merchant) => {
     // Handle edit action
-    console.log("Edit", employee);
+    console.log("Edit", merchant);
   };
 
-  const handleDelete = (employee) => {
+  const handleDelete = (merchant) => {
     // Handle delete action
-    console.log("Delete", employee);
+    console.log("Delete", merchant);
   };
 
   return (
-    <Row>
-      {employees.map((employee) => (
-        <EmployeeCard
-          key={employee.id}
-          employee={employee}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
-      ))}
-    </Row>
+    <div>
+      {merchants.length > 0 ? (
+        <Row>
+          {merchants.map((merchant) => (
+            <MerchantCard
+              key={merchant.id}
+              merchant={merchant}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </Row>
+      ) : (
+        <h3>No Merchant in system</h3>
+      )}
+    </div>
   );
 };
 
-export default EmployeeList;
+export default MerchantList;

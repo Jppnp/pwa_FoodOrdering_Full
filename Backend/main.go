@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+
 	router := gin.Default()
 
 	config.Connect()

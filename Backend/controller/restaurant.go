@@ -4,44 +4,93 @@ import (
 	"net/http"
 	"pwaV3/config"
 	"pwaV3/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type RestaurantController struct{}
 
-func (ad *RestaurantController) AddRestaurant(c *gin.Context) {
-	var restaurant models.Restaurant
-	c.BindJSON(&restaurant)
-	config.DB.Create(&restaurant)
-	c.JSON(200, &restaurant)
+func (rc *RestaurantController) GetRestaurants(c *gin.Context) {
+	var restaurants []models.Restaurant
+	if err := config.DB.Preload("RestaurantLocations").Find(&restaurants).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get restaurants"})
+		return
+	}
+	c.JSON(http.StatusOK, restaurants)
 }
 
-func (ad *RestaurantController) GetAllRestaurant(c *gin.Context) {
-	restaurants := []models.Restaurant{}
-	config.DB.Find(&restaurants)
-	c.IndentedJSON(http.StatusOK, &restaurants)
+func (rc *RestaurantController) GetRestaurantByID(c *gin.Context) {
+	restaurantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant ID"})
+		return
+	}
+
+	var restaurant models.Restaurant
+	if err := config.DB.Preload("RestaurantLocations").First(&restaurant, restaurantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "restaurant not found"})
+		return
+	}
+	c.JSON(http.StatusOK, restaurant)
 }
 
-func (ad *RestaurantController) GetRestaurantById(c *gin.Context) {
+func (rc *RestaurantController) CreateRestaurant(c *gin.Context) {
 	var restaurant models.Restaurant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).Find(&restaurant)
-	c.IndentedJSON(http.StatusOK, &restaurant)
+	if err := c.ShouldBindJSON(&restaurant); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant data"})
+		return
+	}
+	if err := config.DB.Create(&restaurant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create restaurant"})
+		return
+	}
+	c.JSON(http.StatusCreated, restaurant)
 }
 
-func (ad *RestaurantController) UpdateRestaurant(c *gin.Context) {
+func (rc *RestaurantController) UpdateRestaurant(c *gin.Context) {
+	restaurantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant ID"})
+		return
+	}
+
 	var restaurant models.Restaurant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).First(&restaurant)
-	c.BindJSON(&restaurant)
-	config.DB.Save(&restaurant)
-	c.IndentedJSON(http.StatusOK, &restaurant)
+	if err := config.DB.First(&restaurant, restaurantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "restaurant not found"})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&restaurant); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant data"})
+		return
+	}
+
+	if err := config.DB.Save(&restaurant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update restaurant"})
+		return
+	}
+
+	c.JSON(http.StatusOK, restaurant)
 }
 
-func (ad *RestaurantController) DeleteRestaurant(c *gin.Context) {
+func (rc *RestaurantController) DeleteRestaurant(c *gin.Context) {
+	restaurantID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid restaurant ID"})
+		return
+	}
+
 	var restaurant models.Restaurant
-	id := c.Param("id")
-	config.DB.Where("id = ?", id).Delete(&restaurant)
-	c.JSON(200, &restaurant)
+	if err := config.DB.First(&restaurant, restaurantID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "restaurant not found"})
+		return
+	}
+
+	if err := config.DB.Delete(&restaurant).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete restaurant"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "restaurant deleted"})
 }

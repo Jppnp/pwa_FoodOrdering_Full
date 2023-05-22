@@ -2,7 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Form, Button, Modal } from "react-bootstrap";
 import bg from "../assets/bg.jpg";
-import { isLogin, getRole, userLogin } from "../utils/UserControl";
+import {
+  isLogin,
+  getRole,
+  userLogin,
+  merchantLogin,
+} from "../utils/UserControl";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_BASE_URL,
+});
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,8 +37,26 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  const handleLogin = () => {
-    // Perform login logic here
+  const handleLogin = async () => {
+    try {
+      const response = await api.get(`/merchants/email/${username}`);
+      const merchant = response.data;
+
+      if (merchant && password === merchant.password) {
+        await merchantLogin(
+          merchant.id,
+          merchant.role,
+          merchant.restaurant_location_id
+        );
+        navigate(`/${merchant.role}`);
+      } else {
+        handleModal("Invalid username/email or password");
+      }
+    } catch (error) {
+      console.log("Login not found:", error);
+      handleModal("Invalid username/email or password");
+    }
+
     if (username === "admin" && password === "admin") {
       userLogin("1", "admin");
       navigate("/admin");
@@ -36,7 +64,7 @@ const Login = () => {
       userLogin("1", "client");
       navigate("/client");
     } else {
-      handleModal("Invalid username or password");
+      handleModal("Invalid username/email or password");
     }
   };
 
@@ -94,7 +122,7 @@ const Login = () => {
                     <Form.Label>Username</Form.Label>
                     <Form.Control
                       type="text"
-                      placeholder="Enter username"
+                      placeholder="Enter username or email"
                       value={username}
                       onChange={handleUsernameChange}
                       style={{ marginTop: "1rem", marginBottom: "1rem" }}
