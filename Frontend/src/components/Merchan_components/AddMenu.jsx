@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Form, Button, Modal, Image } from "react-bootstrap";
 import { api } from "../../utils/UserControl";
+import { useNavigate } from "react-router-dom";
+
 
 const restaurant = JSON.parse(localStorage.getItem("restaurant"))
 
@@ -14,7 +16,7 @@ const AddMenu = () => {
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  // const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,7 +24,9 @@ const AddMenu = () => {
     // Here you can perform any necessary actions with the collected data,
     // such as sending it to a server or updating a state in a parent component.
 
-    handleModal(`Name: ${name}\nDes: ${des}\nPrice: ${price}`);
+    handleModal(`Name: ${name}
+    Des: ${des}
+    Price: ${price}`);
   };
 
   const handleImageUpload = (event) => {
@@ -74,8 +78,7 @@ const AddMenu = () => {
       .then((response) => {
         setName("");
         setShowModal(false);
-        console.log(response)
-        // navigate("/merchant/foods");
+        navigate(-1)
       })
       .catch((err) => {
         setErrorModal(true);
@@ -143,7 +146,7 @@ const AddMenu = () => {
           <Form.Label>Upload Image</Form.Label>
           <Form.Control
             type="file"
-            accept="image/jpeg, image/png, image/webp"
+            accept="image/*"
             onChange={handleImageUpload}
             required
           />

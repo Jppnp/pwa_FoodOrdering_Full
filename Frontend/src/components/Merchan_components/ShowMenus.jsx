@@ -6,47 +6,32 @@ import { api } from "../../utils/UserControl";
 const restaurant = JSON.parse(localStorage.getItem("restaurant"));
 
 const MenuCard = ({ menu, onEdit, onDelete }) => {
-  const { id, name, des, price, image_path, category } = menu;
+  const { id, name, description, price, image_path, category } = menu;
   console.log(`Menu: ${menu}`);
 
   return (
-    <Col xs={12} md={9} lg={7} xl={6} xxl={5}>
-      <Card
-        style={{
-          marginBottom: "20px",
-          justifyContent: "space-between",
-          overflow: "hidden",
-        }}
-      >
-        <Row>
-          <Col xs={4} md={4} style={{ padding: "20px 10px 20px 25px" }}>
-            <Card.Img
-              src={image_path}
-              alt={name}
-              style={{ width: `${window.innerWidth * 0.15}px`, height: `${window.innerWidth * 0.1}` }}
-            />
-          </Col>
-          <Col xs={8} md={8}>
-            <Card.Body style={{marginLeft: '10px'}}>
-              <Card.Title>Name: {name}</Card.Title>
-              <Card.Text>Description: {des}</Card.Text>
-              <Card.Text>Price: {price} ฿</Card.Text>
-              <Card.Subtitle>Category: {category}</Card.Subtitle>
-            </Card.Body>
-          </Col>
-        </Row>
-        <Row>
-          <Card.Body>
-            <div className="d-flex justify-content-around">
-              <Button variant="primary" onClick={() => onEdit(id)}>
-                Edit
-              </Button>{" "}
-              <Button variant="danger" onClick={() => onDelete(id)}>
-                Delete
-              </Button>
-            </div>
-          </Card.Body>
-        </Row>
+    <Col xs={12} md={6} lg={4} xl={3} style={{ marginBottom: "20px" }}>
+      <Card style={{ marginBottom: "20px", height: "100%" }}>
+        <Card.Img
+          variant="top"
+          src={image_path}
+          alt={name}
+          style={{ objectFit: "cover", height: "200px" }}
+        />
+        <Card.Body>
+          <Card.Title>{name}</Card.Title>
+          <Card.Text>{description}</Card.Text>
+          <Card.Text style={{color: "green"}}>ราคา: {price} ฿</Card.Text>
+          <Card.Subtitle>หมวดหมู่: {category}</Card.Subtitle>
+          <div className="d-flex justify-content-around mt-3">
+            <Button variant="primary" onClick={() => onEdit(id)}>
+              แก้ไข
+            </Button>{" "}
+            <Button variant="danger" onClick={() => onDelete(id)}>
+              ลบ
+            </Button>
+          </div>
+        </Card.Body>
       </Card>
     </Col>
   );

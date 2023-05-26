@@ -3,9 +3,11 @@ import axios from "axios";
 export const api = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
-export function userLogin(uid, userRole) {
+export function userLogin(uid, fname, lname, userRole) {
   const user = {
     id: uid,
+    fname: fname,
+    lname: lname,
     role: userRole,
   };
   localStorage.setItem("userData", JSON.stringify(user));
@@ -32,7 +34,7 @@ export function userLogout() {
 
 export function merchantLogout() {
   localStorage.removeItem("userData");
-  localStorage.removeItem("Restaurant");
+  localStorage.removeItem("restaurant");
 }
 
 export async function merchantLogin(uid, userRole, restaurant_location_id) {
@@ -41,8 +43,16 @@ export async function merchantLogin(uid, userRole, restaurant_location_id) {
       `/restaurant/locations/location/${restaurant_location_id}`
     );
     localStorage.setItem("restaurant", JSON.stringify(locationResponse.data));
-    localStorage.setItem("userData", JSON.stringify({ id: uid, role: userRole }));
+    localStorage.setItem(
+      "userData",
+      JSON.stringify({ id: uid, role: userRole })
+    );
   } catch (error) {
-    console.log("Error While merchant login ", error)
+    console.log("Error While merchant login ", error);
   }
+}
+
+export function getCustomerInfo() {
+  const customer = JSON.parse(localStorage.getItem("userData"))
+  return customer
 }

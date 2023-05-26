@@ -42,21 +42,31 @@ export default function OrderForm() {
   };
 
   const addToCart = (item) => {
-    var updateCartItems = [...cartItems.items, item];
     if (localStorage.getItem("cartItems")) {
-      setCartItems({ ...cartItems, items: updateCartItems });
-
       const oldCart = JSON.parse(localStorage.getItem("cartItems"));
       if (oldCart.rid === rid) {
-        localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        const updatedItems = [...oldCart.items, item];
+        const updatedCart = { ...oldCart, items: updatedItems };
+        setCartItems(updatedCart);
+        localStorage.setItem("cartItems", JSON.stringify(updatedCart));
       } else {
         setModal(true);
       }
     } else {
-      setCartItems({ ...cartItems, items: updateCartItems });
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      const newCart = {
+        rid: rid,
+        items: [item],
+      };
+      setCartItems(newCart);
+      localStorage.setItem("cartItems", JSON.stringify(newCart));
     }
-    navigate(-1);
+    navigate(-1)
+  };
+
+  const handleSubmit = () => {
+    const newItem = { name, price, note, quantity };
+    console.log(`New item: ${newItem.name}`);
+    addToCart(newItem);
   };
 
   const modalAccept = (accept) => {
@@ -65,12 +75,6 @@ export default function OrderForm() {
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }
     navigate(-1);
-  };
-
-  const handleSubmit = () => {
-    const newItem = { name, description, price, note, quantity };
-    addToCart(newItem);
-    window.history.back();
   };
 
   return (

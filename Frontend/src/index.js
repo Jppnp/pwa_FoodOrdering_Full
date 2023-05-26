@@ -6,6 +6,7 @@ import App from "./App";
 // import reportWebVitals from './reportWebVitals';
 import swDev from "./swDev";
 import { ProSidebarProvider } from "react-pro-sidebar";
+import 'react-spinner-animated/dist/index.css'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

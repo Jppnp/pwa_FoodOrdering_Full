@@ -11,6 +11,9 @@ func SetupRoutes(router *gin.Engine) {
 	restaurantController := &controller.RestaurantController{}
 	locationController := &controller.LocationController{}
 	menuController := &controller.MenuController{}
+	OrderController := &controller.OrderController{}
+	CustomerController := &controller.CustomerController{}
+	PaymentController := &controller.PaymentController{}
 
 	merchantRoutes := router.Group("/merchants")
 	{
@@ -57,4 +60,23 @@ func SetupRoutes(router *gin.Engine) {
 		menuRoutes.DELETE("delete/:rid/:menuID", menuController.DeleteMenu)
 	}
 
+	orderRoutes := router.Group("/order")
+	{
+		orderRoutes.POST("", OrderController.CreateOrder)
+	}
+
+	customerRoutes := router.Group("/customer")
+	{
+		customerRoutes.POST("", CustomerController.CreateCustomer)
+		customerRoutes.GET(":id", CustomerController.GetCustomerByID)
+		customerRoutes.POST("login", CustomerController.CustomerLogin)
+	}
+
+	paymentRoutes := router.Group("/payment")
+	{
+		paymentRoutes.POST("", PaymentController.CreatePayment)
+		paymentRoutes.DELETE(":id", PaymentController.DeletePayment)
+		paymentRoutes.PATCH(":id", PaymentController.UpdatePayment)
+		paymentRoutes.GET(":id", PaymentController.GetPayment)
+	}
 }

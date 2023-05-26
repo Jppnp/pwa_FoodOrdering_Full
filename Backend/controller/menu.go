@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"path/filepath"
 	"pwaV3/config"
 	"pwaV3/models"
@@ -215,6 +216,35 @@ func (mc *MenuController) DeleteMenu(c *gin.Context) {
 
 	if menu.ID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Menu item not found"})
+		return
+	}
+
+	// Delete the image from storage
+	storageClient, err := config.CreateStorageClient()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot create storage client"})
+		return
+	}
+
+	// Extract the filename from the ImagePath
+	url, err := url.Parse(menu.ImagePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid image URL"})
+		return
+	}
+
+	filename := filepath.Base(url.Path)
+
+	ctx := context.Background()
+	bucket, err := storageClient.DefaultBucket()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot get default bucket"})
+		return
+	}
+
+	obj := bucket.Object(filename)
+	if err := obj.Delete(ctx); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image from storage"})
 		return
 	}
 

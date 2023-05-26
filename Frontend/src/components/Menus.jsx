@@ -18,11 +18,14 @@ export default function Menus() {
   const { rid } = useParams();
 
   useEffect(() => {
-    api.get(`menus/location/${rid}`).then((res) => {
-      setMenuItems(res.data)
-    }).catch(err => {
-      console.log(`error get menu: ${err}`)
-    })
+    api
+      .get(`menus/location/${rid}`)
+      .then((res) => {
+        setMenuItems(res.data);
+      })
+      .catch((err) => {
+        console.log(`error get menu: ${err}`);
+      });
   }, [rid]);
 
   const categories = [
@@ -34,9 +37,8 @@ export default function Menus() {
     setActiveCategory(categories[activeIndex]);
   };
 
-  const fileredMenu = menuItems.filter((menu) =>
-    menu.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const fileredMenu = (menu) =>
+    menu.name.toLowerCase().includes(searchTerm.toLowerCase());
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -69,10 +71,10 @@ export default function Menus() {
                       ? category !== "All"
                         ? item.category === category
                         : {}
-                      : { fileredMenu }
+                      : fileredMenu(item)
                   )
                   .map((item) => (
-                    <Col key={item.id} xs={12} md={6}>
+                    <Col key={item.id} xs={12} md={9} lg={7} xl={6} xxl={5}>
                       <Link
                         to={`/client/menus/${rid}/${item.id}`}
                         state={{ selectedMenu: item }}

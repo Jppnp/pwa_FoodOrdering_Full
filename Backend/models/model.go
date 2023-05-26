@@ -42,38 +42,36 @@ type Menu struct {
 type Order struct {
 	ID                   uint        `gorm:"primaryKey;autoIncrement" json:"id"`
 	Status               string      `json:"status"`
-	RestaurantLocationID uint        `gorm:"not null"`
-	OrderItems           []OrderItem `gorm:"foreignKey:OrderID" json:"orderItems"`
-	CustomerID           uint        `json:"-"`
-	Customer             *Customer   `json:"customer"`
+	RestaurantLocationID uint        `json:"restaurant_location_id"`
+	OrderItems           []OrderItem `gorm:"foreignKey:OrderID"`
+	CustomerID           uint        `json:"customer_id"`
+	Date                 time.Time   `json:"date"`
+	PaymentID            uint        `json:"payment_id"`
 }
 
 type OrderItem struct {
 	ID       uint   `gorm:"primaryKey;autoIncrement" json:"id"`
-	OrderID  uint   `json:"order_id" gorm:"not null"`
-	Order    Order  `gorm:"foreignKey:OrderID"`
+	OrderID  uint   `json:"order_id"`
 	MenuID   uint   `json:"menu_id" gorm:"not null"`
-	Menu     Menu   `gorm:"foreignKey:MenuID"`
 	Note     string `json:"note"`
 	Quantity uint   `json:"quantity"`
 }
 
-type Customer struct {
-	ID       uint    `gorm:"primaryKey;autoIncrement" json:"id"`
-	FName    string  `json:"fname"`
-	LName    string  `json:"lname"`
-	Email    string  `json:"email"`
-	Phone    string  `json:"phone"`
-	Password string  `json:"-"`
-	Orders   []Order `json:"orders"`
-}
-
 type Payment struct {
-	ID      uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	Type    string    `json:"type"`
-	Status  string    `json:"status"`
-	Amount  float64   `json:"amount"`
-	Date    time.Time `json:"date"`
-	OrderID uint      `json:"-"`
-	Order   Order     `json:"order"`
+	ID     uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Type   string    `json:"type"`
+	Status string    `json:"status"`
+	Price  float64   `json:"price"`
+	Date   time.Time `json:"date"`
+	Order  Order
+}
+type Customer struct {
+	ID           uint    `gorm:"primaryKey;autoIncrement" json:"id"`
+	FName        string  `json:"fname"`
+	LName        string  `json:"lname"`
+	Email        string  `json:"email"`
+	Phone        string  `json:"phone"`
+	Username     string  `json:"username"`
+	HashPassword string  `json:"password"`
+	Orders       []Order `gorm:"foreignKey:CustomerID"`
 }
