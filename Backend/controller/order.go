@@ -20,7 +20,7 @@ func (oc *OrderController) CreateOrder(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error bind": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -35,7 +35,7 @@ func (oc *OrderController) CreateOrder(c *gin.Context) {
 	}
 
 	if err := config.DB.Create(&order).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error create": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -46,7 +46,7 @@ func (oc *OrderController) CreateOrder(c *gin.Context) {
 
 	// Save the order items
 	if err := config.DB.Create(&order.OrderItems).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error save": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"order": order})

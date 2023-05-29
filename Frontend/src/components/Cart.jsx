@@ -3,6 +3,7 @@ import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
 import { api, getCustomerInfo } from "../utils/UserControl";
 import PaymentSelect from "./Payment";
 import Loading from "./Utility_component/Loading";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -11,6 +12,7 @@ const Cart = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
   const customer = getCustomerInfo();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -53,7 +55,7 @@ const Cart = () => {
   const removeItem = (itemToRemove) => {
     const updatedCart = cartItems.filter((item) => item !== itemToRemove);
     setCartItems(updatedCart);
-  
+
     // Update localStorage with the updated cart items
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
     if (storedCartItems) {
@@ -76,11 +78,37 @@ const Cart = () => {
     setShowPayment(true);
   };
 
-  const selectedPayment = (type) => {
+  const selectedPayment = async (payment) => {
     setShowPayment(false);
-    if (type) {
+    if (payment) {
       // Handle selected payment type
+      setLoading(true);
+      const newOrder = {
+        restaurant_location_id: location.id,
+        customer_id: customer.id,
+        items: cartItems,
+        payment_id: payment.id,
+      };
+      if (payment.type === "online") {
+        try {
+          await api.post("order", JSON.stringify(newOrder));
+          removeCart();
+          setLoading(false);
+          navigate("/client/history");
+        } catch (err) {
+          console.log(`has error while create order: ${err.response.message}`);
+        }
+      }
     }
+  };
+
+  const removeCart = () => {
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+    const updatedCarts = storedCartItems.filter(
+      (cart) => cart.customer_id !== customer.id
+    );
+    storedCartItems.carts = updatedCarts;
+    localStorage.setItem("cartItems", JSON.stringify(storedCartItems));
   };
 
   const logging = (item) => {
