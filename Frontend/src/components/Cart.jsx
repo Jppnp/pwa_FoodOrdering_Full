@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
-import { api } from "../utils/UserControl";
+import { api, getCustomerInfo } from "../utils/UserControl";
 import PaymentSelect from "./Payment";
 import Loading from "./Utility_component/Loading";
 
@@ -8,17 +8,19 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const [location, setLocation] = useState("");
-  const [showPayment, setShowPayMent] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
+  const customer = getCustomerInfo();
 
   useEffect(() => {
     setLoading(true);
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
-    const getName = async () => {
+
+    const getName = async (getRid) => {
       try {
-        console.log("In try");
+        console.log(`get rid: ${cartItems}`);
         const locationRes = await api.get(
-          `restaurant/locations/location/${storedCartItems.rid}`
+          `restaurant/locations/location/${getRid}`
         );
         const { restaurant_id } = locationRes.data;
 
@@ -32,8 +34,13 @@ const Cart = () => {
     };
 
     if (storedCartItems) {
-      setCartItems(storedCartItems.items);
-      getName();
+      const matching = storedCartItems.carts.find(
+        (cart) => cart.customer_id === customer.id
+      );
+      if (matching) {
+        setCartItems(matching.cart.items);
+        getName(matching.cart.rid);
+      }
     }
     setLoading(false);
   }, []);
@@ -41,29 +48,41 @@ const Cart = () => {
   const handleClearCart = () => {
     localStorage.removeItem("cartItems");
     setCartItems([]);
-    totalPrice = 0;
   };
 
   const removeItem = (itemToRemove) => {
     const updatedCart = cartItems.filter((item) => item !== itemToRemove);
     setCartItems(updatedCart);
+  
+    // Update localStorage with the updated cart items
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+    if (storedCartItems) {
+      const matching = storedCartItems.carts.find(
+        (cart) => cart.customer_id === customer.id
+      );
+      if (matching) {
+        matching.cart.items = updatedCart;
+        localStorage.setItem("cartItems", JSON.stringify(storedCartItems));
+      }
+    }
   };
 
- const totalPrice = cartItems.reduce((accumulator, item) => {
-  const { price, quantity } = item
-  return accumulator + (price * quantity)
- }, 0)
+  const totalPrice = cartItems.reduce((accumulator, item) => {
+    const { price, quantity } = item;
+    return accumulator + price * quantity;
+  }, 0);
 
   const handleSubmit = () => {
-    setShowPayMent(true);
+    setShowPayment(true);
   };
 
   const selectedPayment = (type) => {
-    setShowPayMent(false);
-    if(type) {
-      
+    setShowPayment(false);
+    if (type) {
+      // Handle selected payment type
     }
   };
+
   const logging = (item) => {
     console.log(`item: ${item.name}`);
     console.log(`length of cart: ${cartItems.length}`);
@@ -123,7 +142,7 @@ const Cart = () => {
                                 </p>
                                 <Button
                                   variant="danger"
-                                  onClick={(item) => removeItem(item)}
+                                  onClick={() => removeItem(item)}
                                 >
                                   ลบรายการอาหาร
                                 </Button>

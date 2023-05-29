@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import CustomModal from "../CustomModal";
+import CustomModal from "../Utility_component/CustomModal";
 import { api } from "../../utils/UserControl";
 
 const AddRestaurantBranch = () => {

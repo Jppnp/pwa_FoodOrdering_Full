@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Card } from "react-bootstrap";
 import { api } from "../utils/UserControl";
-import CustomModal from "./CustomModal";
+import CustomModal from "./Utility_component/CustomModal";
 import { Link, useNavigate } from "react-router-dom";
 
 const RegistrationForm = () => {

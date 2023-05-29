@@ -13,6 +13,10 @@ export function userLogin(uid, fname, lname, userRole) {
   localStorage.setItem("userData", JSON.stringify(user));
 }
 
+export function adminLogin() {
+  localStorage.setItem("userData", JSON.stringify({"role": "admin"}))
+}
+
 export function isLogin() {
   if (localStorage.getItem("userData")) {
     return true;

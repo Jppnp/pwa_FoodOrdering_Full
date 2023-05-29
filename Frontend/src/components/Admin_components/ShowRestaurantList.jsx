@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Col, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import CustomModal from "../CustomModal";
+import CustomModal from "../Utility_component/CustomModal";
 import { api } from "../../utils/UserControl";
 
 const RestaurantCard = ({ restaurant, onEdit, onDelete, onSee }) => {

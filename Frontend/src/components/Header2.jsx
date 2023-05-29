@@ -3,9 +3,8 @@ import { Container, Nav, Navbar, NavLink } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
-const user = JSON.parse(localStorage.getItem("userData"))
-
 export default function Header2() {
+  const user = JSON.parse(localStorage.getItem("userData"))
   return (
     <Navbar
       collapseOnSelect

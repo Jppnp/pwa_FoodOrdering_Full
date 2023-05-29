@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { Card, Button } from "react-bootstrap";
-import CustomModal from "./CustomModal";
+import CustomModal from "./Utility_component/CustomModal";
+import { getCustomerInfo } from "../utils/UserControl";
 
 export default function OrderForm() {
   const { state } = useLocation();
   const { selectedMenu } = state;
   const { rid } = useParams();
   const navigate = useNavigate();
+  const customer = getCustomerInfo();
 
   const { name, description, price, image_path } = selectedMenu;
   const [note, setNote] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [cartItems, setCartItems] = useState({
-    rid: rid,
-    items: [],
-  });
+  const [cartItems, setCartItems] = useState([]);
   const [showModal, setModal] = useState(false);
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
     if (storedCartItems) {
-      setCartItems(storedCartItems);
+      setCartItems(storedCartItems.carts);
     }
   }, []);
 
@@ -42,25 +41,70 @@ export default function OrderForm() {
   };
 
   const addToCart = (item) => {
-    if (localStorage.getItem("cartItems")) {
-      const oldCart = JSON.parse(localStorage.getItem("cartItems"));
-      if (oldCart.rid === rid) {
-        const updatedItems = [...oldCart.items, item];
-        const updatedCart = { ...oldCart, items: updatedItems };
-        setCartItems(updatedCart);
-        localStorage.setItem("cartItems", JSON.stringify(updatedCart));
-      } else {
-        setModal(true);
+    if (cartItems.length > 0) {
+      try {
+        let updatedCartItems = [...cartItems];
+
+        const customerCartIndex = updatedCartItems.findIndex(
+          (cart) => cart.customer_id === customer.id && cart.cart.rid === rid
+        );
+
+        if (customerCartIndex !== -1) {
+          // If customer has a cart with matching rid
+          const updatedItems = [
+            ...updatedCartItems[customerCartIndex].cart.items,
+            item,
+          ];
+          updatedCartItems[customerCartIndex] = {
+            ...updatedCartItems[customerCartIndex],
+            cart: {
+              ...updatedCartItems[customerCartIndex].cart,
+              items: updatedItems,
+            },
+          };
+        } else {
+          // If customer doesn't have a cart with matching rid
+          const customerCartIndexWithoutRid = updatedCartItems.findIndex(
+            (cart) => cart.customer_id === customer.id
+          );
+
+          if (customerCartIndexWithoutRid !== -1) {
+            // If customer has a cart without matching rid
+            const updatedItems = [
+              ...updatedCartItems[customerCartIndexWithoutRid].cart.items,
+              item,
+            ];
+            updatedCartItems[customerCartIndexWithoutRid] = {
+              ...updatedCartItems[customerCartIndexWithoutRid],
+              cart: { rid: rid, items: updatedItems },
+            };
+          } else {
+            // If customer doesn't have any existing cart
+            const newCart = {
+              customer_id: customer.id,
+              cart: { rid: rid, items: [item] },
+            };
+            updatedCartItems = [...updatedCartItems, newCart];
+          }
+        }
+
+        setCartItems(updatedCartItems);
+        localStorage.setItem(
+          "cartItems",
+          JSON.stringify({ carts: updatedCartItems })
+        );
+      } catch (error) {
+        // Handle any potential errors here
       }
     } else {
       const newCart = {
-        rid: rid,
-        items: [item],
+        customer_id: customer.id,
+        cart: { rid: rid, items: [item] },
       };
-      setCartItems(newCart);
-      localStorage.setItem("cartItems", JSON.stringify(newCart));
+      setCartItems([newCart]);
+      localStorage.setItem("cartItems", JSON.stringify({ carts: [newCart] }));
     }
-    navigate(-1)
+    navigate(-1);
   };
 
   const handleSubmit = () => {

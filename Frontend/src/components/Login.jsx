@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card, Form, Button, Modal} from "react-bootstrap";
 import bg from "../assets/bg.jpg";
-import { isLogin, getRole, userLogin } from "../utils/UserControl";
+import { isLogin, getRole, userLogin, adminLogin } from "../utils/UserControl";
 import { api } from "../utils/UserControl";
 import Loading from "./Utility_component/Loading";
 
@@ -37,8 +37,8 @@ const Login = () => {
       password: password,
     };
     if (username === "admin" && password === "admin") {
-      userLogin("1", "admin");
-      navigate("/admin");
+      adminLogin()
+      navigate("/admin/");
     } else {
       console.log("Logging...")
       await api

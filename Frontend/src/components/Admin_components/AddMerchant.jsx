@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import CustomModal from "../CustomModal";
+import CustomModal from "../Utility_component/CustomModal";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../utils/UserControl";
 
