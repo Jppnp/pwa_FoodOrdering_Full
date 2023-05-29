@@ -58,12 +58,13 @@ type OrderItem struct {
 }
 
 type Payment struct {
-	ID     uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	Type   string    `json:"type"`
-	Status string    `json:"status"`
-	Price  float64   `json:"price"`
-	Date   time.Time `json:"date"`
-	Order  Order
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Reference string    `json:"reference"`
+	Type      string    `json:"type"`
+	Status    string    `json:"status"`
+	Price     float64   `json:"price"`
+	Date      time.Time `json:"date"`
+	Order     Order
 }
 type Customer struct {
 	ID           uint    `gorm:"primaryKey;autoIncrement" json:"id"`

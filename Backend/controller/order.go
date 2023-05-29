@@ -13,7 +13,6 @@ type OrderController struct{}
 
 func (oc *OrderController) CreateOrder(c *gin.Context) {
 	var request struct {
-		Status               string             `json:"status"`
 		RestaurantLocationID uint               `json:"restaurant_location_id"`
 		CustomerID           uint               `json:"customer_id"`
 		Items                []models.OrderItem `json:"items"`
@@ -27,7 +26,7 @@ func (oc *OrderController) CreateOrder(c *gin.Context) {
 
 	// Create the order
 	order := models.Order{
-		Status:               request.Status,
+		Status:               "queqe",
 		RestaurantLocationID: request.RestaurantLocationID,
 		OrderItems:           request.Items,
 		CustomerID:           request.CustomerID,
