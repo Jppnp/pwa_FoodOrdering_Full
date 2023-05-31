@@ -11,7 +11,7 @@ export default function OrderForm() {
   const navigate = useNavigate();
   const customer = getCustomerInfo();
 
-  const { name, description, price, image_path } = selectedMenu;
+  const { id, name, description, price, image_path } = selectedMenu;
   const [note, setNote] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [cartItems, setCartItems] = useState([]);
@@ -19,6 +19,7 @@ export default function OrderForm() {
 
   useEffect(() => {
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+    console.log(`log: ${storedCartItems}`)
     if (storedCartItems) {
       setCartItems(storedCartItems.carts);
     }
@@ -41,7 +42,7 @@ export default function OrderForm() {
   };
 
   const addToCart = (item) => {
-    if (cartItems.length > 0) {
+    if (cartItems) {
       try {
         let updatedCartItems = [...cartItems];
 
@@ -108,7 +109,7 @@ export default function OrderForm() {
   };
 
   const handleSubmit = () => {
-    const newItem = { name, price, note, quantity };
+    const newItem = { menu_id: id, name, price, note, quantity };
     console.log(`New item: ${newItem.name}`);
     addToCart(newItem);
   };
@@ -180,7 +181,7 @@ export default function OrderForm() {
               style={{ borderRadius: "10px" }}
               onClick={handleSubmit}
             >
-              {price * quantity} $
+              {price * quantity} ฿
             </Button>
           </div>
         </div>

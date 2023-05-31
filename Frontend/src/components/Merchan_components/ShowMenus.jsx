@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Col, Row } from "react-bootstrap";
+import { Card, Button, Col, Row, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../utils/UserControl";
 
 const restaurant = JSON.parse(localStorage.getItem("restaurant"));
 
-const MenuCard = ({ menu, onEdit, onDelete }) => {
-  const { id, name, description, price, image_path, category } = menu;
-  console.log(`Menu: ${menu}`);
+const MenuCard = ({ menu, onEdit, onDelete, onStatus }) => {
+  const { id, name, description, price, image_path, category, status } = menu;
+  const [isOpen, setIsOpen] = useState(status === "sell");
 
   return (
     <Col xs={12} md={6} lg={4} xl={3} style={{ marginBottom: "20px" }}>
-      <Card style={{ marginBottom: "20px", height: "100%" }}>
+      <Card style={{ marginBottom: "20px", height: "100%"}}>
         <Card.Img
           variant="top"
           src={image_path}
@@ -21,7 +21,9 @@ const MenuCard = ({ menu, onEdit, onDelete }) => {
         <Card.Body>
           <Card.Title>{name}</Card.Title>
           <Card.Text>{description}</Card.Text>
-          <Card.Text style={{color: "green"}}>ราคา: {price} ฿</Card.Text>
+          <Card.Text style={{ color: isOpen ? "green" : "red" }}>
+            ราคา: {price} ฿
+          </Card.Text>
           <Card.Subtitle>หมวดหมู่: {category}</Card.Subtitle>
           <div className="d-flex justify-content-around mt-3">
             <Button variant="primary" onClick={() => onEdit(id)}>
@@ -32,6 +34,15 @@ const MenuCard = ({ menu, onEdit, onDelete }) => {
             </Button>
           </div>
         </Card.Body>
+        <Card.Footer>
+          <Form.Check
+            type="switch"
+            id={`switch-${id}`}
+            label={isOpen ? `พร้อมขาย` : `หมด`}
+            checked={isOpen}
+            onChange={() => onStatus(id, status)}
+          />
+        </Card.Footer>
       </Card>
     </Col>
   );
@@ -78,6 +89,18 @@ const MenuList = () => {
     }
   };
 
+  const handleChangeStatus = async (menuID, menuStatus) => {
+    try {
+      if (menuStatus === "sell") {
+        await api.put(`/menus/status/sold/${menuID}`)
+      } else {
+        await api.put(`/menus/status/sell/${menuID}`)
+      }
+      window.location.reload()
+    } catch (error) {
+      alert(`Network error: ${error}`)
+    }
+  }
   return (
     <div>
       <Button
@@ -98,12 +121,14 @@ const MenuList = () => {
               menu={menu}
               onEdit={handleUpdateMenu}
               onDelete={handleDeleteMenu}
+              onStatus={handleChangeStatus}
             />
           ))
         )}
       </Row>
     </div>
   );
+  
 };
 
 export default MenuList;

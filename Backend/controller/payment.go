@@ -38,7 +38,7 @@ func (pc *PaymentController) CreatePayment(c *gin.Context) {
 		return
 	}
 
-	var payment models.Payment
+	var payment models.Payments
 	// Set the time zone to Bangkok, Thailand
 	loc, err := time.LoadLocation("Asia/Bangkok")
 	if err != nil {
@@ -51,9 +51,9 @@ func (pc *PaymentController) CreatePayment(c *gin.Context) {
 	payment.Type = request.Type
 	if payment.Type == "online" {
 		payment.Status = "paid"
-		payment.Reference = generateReference(14)
+		payment.Reference = generateReference(10)
 	} else {
-		payment.Status = "notpaid"
+		payment.Status = "cash"
 		payment.Reference = "cash"
 	}
 	payment.Price = request.Price
@@ -68,7 +68,7 @@ func (pc *PaymentController) CreatePayment(c *gin.Context) {
 
 func (pc *PaymentController) GetPayment(c *gin.Context) {
 	id := c.Param("id")
-	var payment models.Payment
+	var payment models.Payments
 
 	if err := config.DB.First(&payment, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -80,7 +80,7 @@ func (pc *PaymentController) GetPayment(c *gin.Context) {
 
 func (pc *PaymentController) UpdatePayment(c *gin.Context) {
 	id := c.Param("id")
-	var payment models.Payment
+	var payment models.Payments
 
 	if err := config.DB.First(&payment, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -99,7 +99,7 @@ func (pc *PaymentController) UpdatePayment(c *gin.Context) {
 
 func (pc *PaymentController) DeletePayment(c *gin.Context) {
 	id := c.Param("id")
-	var payment models.Payment
+	var payment models.Payments
 
 	if err := config.DB.First(&payment, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -109,4 +109,10 @@ func (pc *PaymentController) DeletePayment(c *gin.Context) {
 	config.DB.Delete(&payment)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Payment deleted successfully"})
+}
+
+func (pc *PaymentController) GetAllPayment(c *gin.Context) {
+	var payment []models.Payments
+	config.DB.Find(&payment)
+	c.JSON(http.StatusOK, payment)
 }

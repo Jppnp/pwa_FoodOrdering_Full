@@ -36,8 +36,18 @@ type Menu struct {
 	Description          string  `json:"description"`
 	Price                float64 `json:"price"`
 	Category             string  `json:"category"`
+	Status               string  `json:"status"`
 	ImagePath            string  `json:"image_path"`
 	RestaurantLocationID uint    `json:"restaurant_location_id"`
+}
+type Payments struct {
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Reference string    `json:"reference"`
+	Type      string    `json:"type"`
+	Status    string    `json:"status"`
+	Price     float64   `json:"price"`
+	Date      time.Time `json:"date"`
+	Order     Order
 }
 type Order struct {
 	ID                   uint        `gorm:"primaryKey;autoIncrement" json:"id"`
@@ -46,26 +56,18 @@ type Order struct {
 	OrderItems           []OrderItem `gorm:"foreignKey:OrderID"`
 	CustomerID           uint        `json:"customer_id"`
 	Date                 time.Time   `json:"date"`
-	PaymentID            uint        `json:"payment_id"`
+	PaymentsID           uint        `json:"payment_id"`
 }
 
 type OrderItem struct {
-	ID       uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	ID       uint   `json:"id" gorm:"primaryKey;autoIncrement"`
+	Name     string `json:"name"`
 	OrderID  uint   `json:"order_id"`
 	MenuID   uint   `json:"menu_id" gorm:"not null"`
 	Note     string `json:"note"`
 	Quantity uint   `json:"quantity"`
 }
 
-type Payment struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Reference string    `json:"reference"`
-	Type      string    `json:"type"`
-	Status    string    `json:"status"`
-	Price     float64   `json:"price"`
-	Date      time.Time `json:"date"`
-	Order     Order
-}
 type Customer struct {
 	ID           uint    `gorm:"primaryKey;autoIncrement" json:"id"`
 	FName        string  `json:"fname"`

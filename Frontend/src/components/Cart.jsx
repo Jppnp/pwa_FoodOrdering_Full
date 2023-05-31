@@ -17,7 +17,7 @@ const Cart = () => {
   useEffect(() => {
     setLoading(true);
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
-
+  
     const getName = async (getRid) => {
       try {
         console.log(`get rid: ${cartItems}`);
@@ -25,18 +25,18 @@ const Cart = () => {
           `restaurant/locations/location/${getRid}`
         );
         const { restaurant_id } = locationRes.data;
-
+  
         const restaurantRes = await api.get(`restaurants/${restaurant_id}`);
-
+  
         setRestaurant(restaurantRes.data);
         setLocation(locationRes.data);
       } catch (err) {
         console.log(`error get restaurant name: ${err}`);
       }
     };
-
+  
     if (storedCartItems) {
-      const matching = storedCartItems.carts.find(
+      const matching = storedCartItems.carts && storedCartItems.carts.find(
         (cart) => cart.customer_id === customer.id
       );
       if (matching) {
@@ -46,6 +46,7 @@ const Cart = () => {
     }
     setLoading(false);
   }, []);
+  
 
   const handleClearCart = () => {
     localStorage.removeItem("cartItems");
@@ -89,21 +90,19 @@ const Cart = () => {
         items: cartItems,
         payment_id: payment.id,
       };
-      if (payment.type === "online") {
-        try {
-          await api.post("order", JSON.stringify(newOrder));
-          removeCart();
-          setLoading(false);
-          navigate("/client/history");
-        } catch (err) {
-          console.log(`has error while create order: ${err.response.message}`);
-        }
+      try {
+        await api.post("order", JSON.stringify(newOrder));
+        removeCart();
+        setLoading(false);
+        navigate("/client/history");
+      } catch (err) {
+        console.log(`has error while create order: ${err}`);
       }
     }
   };
 
   const removeCart = () => {
-    const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
+    const storedCartItems = JSON.parse(localStorage.getItem("cartItems")).carts;
     const updatedCarts = storedCartItems.filter(
       (cart) => cart.customer_id !== customer.id
     );

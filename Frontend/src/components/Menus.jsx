@@ -19,7 +19,7 @@ export default function Menus() {
 
   useEffect(() => {
     api
-      .get(`menus/location/${rid}`)
+      .get(`menus/location/sell/${rid}`)
       .then((res) => {
         setMenuItems(res.data);
       })

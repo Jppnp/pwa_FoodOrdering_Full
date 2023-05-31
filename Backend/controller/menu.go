@@ -33,8 +33,32 @@ func (mc *MenuController) GetMenu(c *gin.Context) {
 
 	c.JSON(http.StatusOK, &menu)
 }
+
+func (mc *MenuController) GetSellMenuByLocation(c *gin.Context) {
+	rid := c.Param("rid")
+
+	var location models.RestaurantLocation
+	if err := config.DB.Preload("Menus").First(&location, rid).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch restaurant location"})
+		return
+	}
+	if location.Menus == nil {
+		c.JSON(http.StatusOK, []models.Menu{})
+		return
+	}
+
+	var sellMenus []models.Menu
+	for _, menu := range location.Menus {
+		if menu.Status == "sell" {
+			sellMenus = append(sellMenus, menu)
+		}
+	}
+
+	c.JSON(http.StatusOK, sellMenus)
+}
+
 func (mc *MenuController) GetMenusByLocation(c *gin.Context) {
-	rid := c.Param("id")
+	rid := c.Param("rid")
 
 	var location models.RestaurantLocation
 	if err := config.DB.Preload("Menus").First(&location, rid).Error; err != nil {
@@ -137,6 +161,9 @@ func (mc *MenuController) CreateMenu(c *gin.Context) {
 
 	// Update the menu's ImagePath field
 	menu.ImagePath = fmt.Sprintf("https://storage.googleapis.com/%s/%s", bucketName, filename)
+
+	// add status
+	menu.Status = "sell"
 
 	// Save the menu record to the database
 	if err := config.DB.Save(&menu).Error; err != nil {
@@ -254,4 +281,50 @@ func (mc *MenuController) DeleteMenu(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Menu item deleted successfully"})
+}
+
+func (mc *MenuController) ChangeMenuStatusToSold(c *gin.Context) {
+	menuID := c.Param("id")
+
+	var menu models.Menu
+	if err := config.DB.First(&menu, menuID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch menu"})
+		return
+	}
+
+	if menu.Status != "sell" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Menu is not currently for sale"})
+		return
+	}
+
+	menu.Status = "sold"
+	if err := config.DB.Save(&menu).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update menu status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Menu status updated to sold"})
+}
+
+func (mc *MenuController) ChangeMenuStatusToSell(c *gin.Context) {
+	menuID := c.Param("id")
+
+	var menu models.Menu
+	if err := config.DB.First(&menu, menuID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch menu"})
+		return
+	}
+
+	if menu.Status != "sold" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Menu is not currently sold"})
+		return
+	}
+
+	menu.Status = "sell"
+	if err := config.DB.Save(&menu).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update menu status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Menu status updated to sell"})
 }

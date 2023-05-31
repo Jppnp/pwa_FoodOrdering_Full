@@ -17,7 +17,8 @@ func Connect() {
 		panic(err)
 	}
 
-	db.AutoMigrate(&models.Merchant{}, &models.Restaurant{}, &models.RestaurantLocation{}, &models.Customer{}, &models.Menu{}, &models.OrderItem{}, &models.Order{}, &models.Payment{})
+	db.AutoMigrate(&models.Merchant{}, &models.Restaurant{}, &models.RestaurantLocation{}, &models.Customer{}, &models.Menu{}, &models.OrderItem{}, &models.Order{})
+	db.AutoMigrate(&models.Payments{})
 
 	DB = db
 }

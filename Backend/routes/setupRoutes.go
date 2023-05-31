@@ -25,13 +25,6 @@ func SetupRoutes(router *gin.Engine) {
 		merchantRoutes.DELETE(":id", merchantController.DeleteMerchant)
 	}
 
-	// adminRoutes := router.Group("/admins")
-	// {
-	// 	adminRoutes.POST("", adminController.AddAdmin)
-	// 	adminRoutes.PATCH(":rid/:mid", adminController.UpdateAdmin)
-	// 	adminRoutes.DELETE(":rid/:mid", adminController.DeleteAdmin)
-	// }
-
 	restaurantRoutes := router.Group("/restaurants")
 	{
 		restaurantRoutes.GET("", restaurantController.GetRestaurants)
@@ -55,14 +48,23 @@ func SetupRoutes(router *gin.Engine) {
 		menuRoutes.POST(":rid", menuController.CreateMenu)
 		menuRoutes.GET("", menuController.GetAllMenus)
 		menuRoutes.GET("location/:rid", menuController.GetMenusByLocation)
+		menuRoutes.GET("location/sell/:rid", menuController.GetSellMenuByLocation)
 		menuRoutes.GET(":id", menuController.GetMenu)
 		menuRoutes.PATCH("update/:rid/:menuID", menuController.UpdateMenu)
 		menuRoutes.DELETE("delete/:rid/:menuID", menuController.DeleteMenu)
+		menuRoutes.PUT("status/sold/:id", menuController.ChangeMenuStatusToSold)
+		menuRoutes.PUT("status/sell/:id", menuController.ChangeMenuStatusToSell)
 	}
 
 	orderRoutes := router.Group("/order")
 	{
 		orderRoutes.POST("", OrderController.CreateOrder)
+		orderRoutes.GET("", OrderController.GetAllOrder)
+		orderRoutes.PUT("cooking/:orderID", OrderController.UpdateOrderStatusToCooking)
+		orderRoutes.PUT("success/:orderID", OrderController.UpdateOrderStatusToSuccess)
+		orderRoutes.GET(":locationID", OrderController.GetOrdersByLocationID)
+		orderRoutes.GET("queqe", OrderController.GetOrdersWithQueueStatus)
+		orderRoutes.GET("customer/:customerID")
 	}
 
 	customerRoutes := router.Group("/customer")
@@ -78,5 +80,6 @@ func SetupRoutes(router *gin.Engine) {
 		paymentRoutes.DELETE(":id", PaymentController.DeletePayment)
 		paymentRoutes.PATCH(":id", PaymentController.UpdatePayment)
 		paymentRoutes.GET(":id", PaymentController.GetPayment)
+		paymentRoutes.GET("", PaymentController.GetAllPayment)
 	}
 }

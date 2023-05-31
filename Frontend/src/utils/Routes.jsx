@@ -25,6 +25,7 @@ import MerchantSidebar from "../components/Merchan_components/MerchantSidebar";
 import MerchantDashboard from "../components/Merchan_components/Dashboard";
 import MenuList from "../components/Merchan_components/ShowMenus";
 import AddMenu from "../components/Merchan_components/AddMenu";
+import OrderNow from "../components/Merchan_components/OrderNow";
 
 export function ClientRoutes() {
   return (
@@ -90,6 +91,7 @@ export function MerchantRoutes() {
               <Route index element={<MerchantDashboard />} />
               <Route path="foods" element={<MenuList />} />
               <Route path="foods/add" element={<AddMenu />} />
+              <Route path="order-now" element={<OrderNow />} />
             </Route>
           </Routes>
         </div>
