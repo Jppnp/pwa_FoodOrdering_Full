@@ -3,7 +3,7 @@ import { Container, Card, Form, Modal, Button } from "react-bootstrap";
 import { AccountBalanceWallet, AccountBalance } from "@mui/icons-material";
 // import { createQR } from "../utils/BankControl";
 import Loading from "./Utility_component/Loading";
-import { api, pushOfflineRequest } from "../utils/UserControl";
+import { api } from "../utils/UserControl";
 import CustomModal from "./Utility_component/CustomModal";
 
 const Payment = ({ price, selected }) => {

@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
-import { api, getCustomerInfo, isOnline } from "../utils/UserControl";
+import {
+  api,
+  getCustomerInfo,
+  isOnline,
+  pushOfflineRequest,
+} from "../utils/UserControl";
 import PaymentSelect from "./Payment";
 import Loading from "./Utility_component/Loading";
 import { useNavigate } from "react-router-dom";
 import CustomModal from "./Utility_component/CustomModal";
+
+const customer = getCustomerInfo();
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -12,7 +19,6 @@ const Cart = () => {
   const [location, setLocation] = useState("");
   const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
-  const customer = getCustomerInfo();
   const navigate = useNavigate();
   const [offlineModal, setOfflineModal] = useState(false);
 
@@ -22,7 +28,6 @@ const Cart = () => {
 
     const getName = async (getRid) => {
       try {
-        console.log(`get rid: ${cartItems}`);
         const locationRes = await api.get(
           `restaurant/locations/location/${getRid}`
         );
@@ -83,9 +88,13 @@ const Cart = () => {
     setOfflineModal(false);
     if (accept && !isOnline) {
       setLoading(true);
+      const data = {
+        type: "cash",
+        price: totalPrice,
+      };
       await pushOfflineRequest(`payment`, `post`, data);
       setLoading(false);
-      navigate("/client/history")
+      navigate("/client/history");
     }
   };
 

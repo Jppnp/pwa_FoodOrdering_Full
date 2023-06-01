@@ -16,7 +16,7 @@ const RestaurantCard = ({ restaurant }) => {
           JSON.parse(localStorage.getItem("restaurantList")) || [];
         const updataData = {
           rid: restaurant_id,
-          name: mainRestaurant.name,
+          name: res.data.name,
         };
         if (hasData) {
           const founded = hasData.filter((item) => item.rid === restaurant_id);

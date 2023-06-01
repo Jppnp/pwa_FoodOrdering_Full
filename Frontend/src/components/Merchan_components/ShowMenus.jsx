@@ -7,7 +7,8 @@ const restaurant = JSON.parse(localStorage.getItem("restaurant"));
 
 const MenuCard = ({ menu, onEdit, onDelete, onStatus }) => {
   const { id, name, description, price, image_path, category, status } = menu;
-  const [isOpen, setIsOpen] = useState(status === "sell");
+  const [isOpen] = useState(status === "sell");
+
 
   return (
     <Col xs={12} md={6} lg={4} xl={3} style={{ marginBottom: "20px" }}>

@@ -1,4 +1,3 @@
-import { HandymanOutlined } from "@mui/icons-material";
 import axios from "axios";
 
 export const api = axios.create({
@@ -73,17 +72,15 @@ export async function pushOfflineRequest(path, method, data) {
       JSON.parse(localStorage.getItem("offlineRequests")) || [];
     storedRequests.push(offlineRequest);
     localStorage.setItem("offlineRequests", JSON.stringify(storedRequests));
-  } catch {
-    (err) => {
-      console.log(`cannot auto syncronize: ${err}`);
-    };
+  } catch (err) {
+    console.log(`cannot auto syncronize: ${err}`);
   }
 }
 
 export function isOnline() {
-  if(navigator.onLine){
-    return true
-  }else {
-    return false
+  if (navigator.onLine) {
+    return true;
+  } else {
+    return false;
   }
 }

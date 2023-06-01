@@ -1,17 +1,14 @@
-FROM node:18.14-alpine
+FROM node:18.16-alpine
+ENV PATH /app/node_modules/.bin:$PATH
+
+RUN apk --no-cache add --virtual .builds-deps build-base python3
+RUN apk update && apk add bash
 
 WORKDIR /app
 
-ENV PATH /app/node_modules/.bin:$PATH
-
-
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN npm install 
-
-RUN npm ci 
-RUN apk update && apk add bash
-
+RUN npm ci
 
 COPY . .
 
