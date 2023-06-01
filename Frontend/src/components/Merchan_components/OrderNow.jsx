@@ -1,63 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Table } from 'react-bootstrap';
-import { api } from '../../utils/UserControl';
+import React, { useState, useEffect } from "react";
+import { Card, Badge, Button } from "react-bootstrap";
+import { api } from "../../utils/UserControl";
+import Loading from "../Utility_component/Loading";
 
 const OrderNow = () => {
   const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const restaurant = JSON.parse(localStorage.getItem("restaurant"));
 
   useEffect(() => {
     // Simulating fetching data from the server
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const response = await api.get("order/queqe");
+        const response = await api.get(`order/queue/${restaurant.id}`);
         const data = await response.data;
         setOrders(data);
       } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error("Error fetching orders:", error);
       }
+      setIsLoading(false);
     };
 
     fetchData();
-  }, []);
+  }, [restaurant.id]);
 
-  const changeOrderStatus = (orderId) => {
-    // TODO: Implement logic to change the order status
-    console.log(`Change status of order ${orderId}`);
+  const firstOrder = orders.length > 0 ? orders[0] : null;
+  const otherOrders = orders.slice(1);
+
+  const changeOrderStatus = async (orderId) => {
+    try {
+      await api.put(`order/success/${orderId}`);
+      // Remove the first order from the orders state
+      setOrders((prevOrders) => prevOrders.slice(1));
+    } catch (error) {
+      console.error("Error changing order status:", error);
+    }
   };
 
   return (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Status</th>
-          <th>Items</th>
-          <th>Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr key={order.id}>
-            <td>{order.id}</td>
-            <td>{order.status}</td>
-            <td>
-              {order.OrderItems.map((item) => (
-                <div key={item.id}>
-                  Menu ID: {item.menu_id}, Quantity: {item.quantity}
+    <div>
+      {isLoading && <Loading />}
+      <div>
+        {firstOrder && (
+          <Card key={firstOrder.id} style={{ marginBottom: "20px" }}>
+            <Card.Header>
+              Order #{firstOrder.id}
+              <div>
+                Date:{" "}
+                <Badge bg="secondary">
+                  {new Date(firstOrder.date).toLocaleString("en-US", {
+                    timeZone: "Asia/Bangkok",
+                  })}
+                </Badge>
+              </div>
+            </Card.Header>
+            <Card.Body>
+              {firstOrder.OrderItems.map((item) => (
+                <div key={item.id} style={{ marginBottom: "10px" }}>
+                  <div>
+                    <strong>{item.name}</strong>
+                  </div>
+                  <div>จำนวน: {item.quantity}</div>
+                  {item.note && (
+                    <div style={{ fontSize: "0.8em" }}>
+                      หมายเหตุ: {item.note}
+                    </div>
+                  )}
                 </div>
               ))}
-            </td>
-            <td>{new Date(order.date).toLocaleString()}</td>
-            <td>
-              <Button onClick={() => changeOrderStatus(order.id)}>
-                Change Status
+            </Card.Body>
+            <Card.Footer>
+              <Button onClick={() => changeOrderStatus(firstOrder.id)}>
+                พร้อมเสิร์ฟ
               </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+            </Card.Footer>
+          </Card>
+        )}
+
+        {otherOrders.length > 0 && (
+          <div>
+            <h4>Other Orders</h4>
+            {otherOrders.map((order) => (
+              <Card key={order.id} style={{ marginBottom: "20px" }}>
+                <Card.Body>
+                  <div>
+                    <strong>Order #{order.id}</strong>
+                  </div>
+                  {order.OrderItems.map((item) => (
+                    <div key={item.id} style={{ marginBottom: "10px" }}>
+                      <div>
+                        <strong>{item.name}</strong>
+                      </div>
+                      <div>จำนวน {item.quantity}</div>
+                      {item.note && (
+                        <div style={{ fontSize: "0.8em" }}>
+                          หมายเหตุ: {item.note}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

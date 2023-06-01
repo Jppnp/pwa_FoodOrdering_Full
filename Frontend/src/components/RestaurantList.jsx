@@ -3,10 +3,31 @@ import { Card, InputGroup, FormControl } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { api, isOnline } from "../utils/UserControl";
 
-const RestaurantCard = ({ restaurant }) => {
-  const { id, name, address, restaurant_id } = restaurant;
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in km
+  return distance;
+}
 
+function toRadians(degrees) {
+  return (degrees * Math.PI) / 180;
+}
+
+const RestaurantCard = ({ restaurant }) => {
+  const { id, name, address, restaurant_id, lat, lng } = restaurant;
   const [mainRestaurant, setMainRestaurant] = useState([]);
+  const [distance, setDistance] = useState(null);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     api
       .get(`/restaurants/${restaurant_id}`)
@@ -43,7 +64,26 @@ const RestaurantCard = ({ restaurant }) => {
           setMainRestaurant(data);
         }
       });
-  }, [restaurant_id]);
+
+    // Get the current location using Geolocation API
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const distance = calculateDistance(latitude, longitude, lat, lng);
+          setDistance(distance.toFixed(2)); // Round to 2 decimal places
+        },
+        (error) => {
+          setError(error.message); // Set the error message
+          if (error.code === error.PERMISSION_DENIED) {
+            alert("Please allow geolocation to calculate the distance.");
+          }
+        }
+      );
+    } else {
+      console.log("Geolocation is not supported");
+    }
+  }, [restaurant_id, lat, lng]);
 
   return (
     <Link to={`/client/menus/${id}`} style={{ color: "#000" }}>
@@ -54,7 +94,13 @@ const RestaurantCard = ({ restaurant }) => {
             <span style={{ color: "#004d39" }}>สาขา {name}</span>
           </Card.Title>
           <Card.Text>{address}</Card.Text>
-          <Card.Subtitle>Distance: km</Card.Subtitle>
+          {error ? (
+            <Card.Subtitle>Error retrieving distance</Card.Subtitle>
+          ) : (
+            <Card.Subtitle>
+              {distance ? distance + " km" : "Calculating..."}
+            </Card.Subtitle>
+          )}
         </Card.Body>
       </Card>
     </Link>

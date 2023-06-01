@@ -68,8 +68,8 @@ func SetupRoutes(router *gin.Engine) {
 		orderRoutes.PUT("cooking/:orderID", OrderController.UpdateOrderStatusToCooking)
 		orderRoutes.PUT("success/:orderID", OrderController.UpdateOrderStatusToSuccess)
 		orderRoutes.GET(":locationID", OrderController.GetOrdersByLocationID)
-		orderRoutes.GET("queqe", OrderController.GetOrdersWithQueueStatus)
-		orderRoutes.GET("customer/:customerID")
+		orderRoutes.GET("queue/:locationID", OrderController.GetOrdersWithQueueStatus)
+		orderRoutes.GET("customer/:customerID", OrderController.GetOrderByCustomerID)
 	}
 
 	customerRoutes := router.Group("/customer")

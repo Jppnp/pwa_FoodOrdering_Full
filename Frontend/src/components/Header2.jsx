@@ -36,20 +36,11 @@ export default function Header2() {
         />
         <Navbar.Collapse id="navbarScroll">
           <Nav className="me-auto" style={{ textAlign: "left" }}>
-            <NavLink as={Link} to="/client/menu">
-              Menu
-            </NavLink>
-            <NavLink as={Link} to="/client/restaurants">
-              Restaurants
-            </NavLink>
             <NavLink as={Link} to="/client/cart">
               Cart
             </NavLink>
             <NavLink as={Link} to="/client/history ">
               History
-            </NavLink>
-            <NavLink as={Link} to="/client/notification ">
-              Notification
             </NavLink>
           </Nav>
         </Navbar.Collapse>

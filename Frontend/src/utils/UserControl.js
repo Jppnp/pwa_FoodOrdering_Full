@@ -77,6 +77,22 @@ export async function pushOfflineRequest(path, method, data) {
   }
 }
 
+export async function pushOfflineRequestOrder(path, method, data) {
+  try {
+    const offlineRequest = {
+      path,
+      method,
+      data,
+    };
+    const storedRequests =
+      JSON.parse(localStorage.getItem("offlineRequestsOrder")) || [];
+    storedRequests.push(offlineRequest);
+    localStorage.setItem("offlineRequestsOrder", JSON.stringify(storedRequests));
+  } catch (err) {
+    console.log(`cannot auto syncronize: ${err}`);
+  }
+}
+
 export function isOnline() {
   if (navigator.onLine) {
     return true;

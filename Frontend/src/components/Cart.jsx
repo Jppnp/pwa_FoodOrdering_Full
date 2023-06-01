@@ -3,7 +3,6 @@ import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
 import {
   api,
   getCustomerInfo,
-  isOnline,
   pushOfflineRequest,
 } from "../utils/UserControl";
 import PaymentSelect from "./Payment";
@@ -13,7 +12,7 @@ import CustomModal from "./Utility_component/CustomModal";
 
 const customer = getCustomerInfo();
 
-const Cart = () => {
+const Cart = ({ isOnline }) => {
   const [cartItems, setCartItems] = useState([]);
   const [restaurant, setRestaurant] = useState("");
   const [location, setLocation] = useState("");
@@ -55,7 +54,7 @@ const Cart = () => {
       }
     }
     setLoading(false);
-  }, []);
+  }, [isOnline]);
 
   const handleClearCart = () => {
     localStorage.removeItem("cartItems");
@@ -88,17 +87,18 @@ const Cart = () => {
     setOfflineModal(false);
     if (accept && !isOnline) {
       setLoading(true);
-      const data = {
+      const paymentData = {
         type: "cash",
         price: totalPrice,
       };
-      await pushOfflineRequest(`payment`, `post`, data);
+      await pushOfflineRequest(`payment`, `post`, paymentData);
       setLoading(false);
-      navigate("/client/history");
+      navigate("/client/");
     }
   };
 
   const handleSubmit = () => {
+    console.log(isOnline);
     if (!isOnline) {
       setOfflineModal(true);
     } else {
@@ -137,11 +137,6 @@ const Cart = () => {
     localStorage.setItem("cartItems", JSON.stringify(storedCartItems));
   };
 
-  const logging = (item) => {
-    console.log(`item: ${item.name}`);
-    console.log(`length of cart: ${cartItems.length}`);
-  };
-
   return (
     <div>
       {loading ? (
@@ -160,7 +155,6 @@ const Cart = () => {
                       </h3>
                       {cartItems.map((item, index) => (
                         <div key={index}>
-                          {logging(item)}
                           <ListGroup>
                             <ListGroup.Item>
                               <h3>{item.name}</h3>

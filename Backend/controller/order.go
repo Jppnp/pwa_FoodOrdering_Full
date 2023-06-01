@@ -118,16 +118,14 @@ func (oc *OrderController) UpdateOrderStatusToSuccess(c *gin.Context) {
 		return
 	}
 
-	if order.Status != "cooking" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid order status"})
-		return
-	}
-
 	order.Status = "success"
 	if err := config.DB.Save(&order).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
+
+	message := []byte("Order Success: " + strconv.FormatUint(uint64(order.ID), 10))
+	oc.Manager.SendToClientByID(order.CustomerID, message)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order status updated to success"})
 }
@@ -136,7 +134,7 @@ func (oc *OrderController) GetOrderByCustomerID(c *gin.Context) {
 	customerID := c.Param("customerID")
 
 	var orders []models.Order
-	if err := config.DB.Preload("OrderItems").Find(&orders, &customerID).Error; err != nil {
+	if err := config.DB.Preload("OrderItems").Where("customer_id = ?", customerID).Find(&orders).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
@@ -145,8 +143,9 @@ func (oc *OrderController) GetOrderByCustomerID(c *gin.Context) {
 }
 
 func (oc *OrderController) GetOrdersWithQueueStatus(c *gin.Context) {
+	rid := c.Param("locationID")
 	var orders []models.Order
-	if err := config.DB.Preload("OrderItems").Where("status = ?", "queue").Find(&orders).Error; err != nil {
+	if err := config.DB.Preload("OrderItems").Where("restaurant_location_id = ? AND status = ?", rid, "queue").Find(&orders).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}

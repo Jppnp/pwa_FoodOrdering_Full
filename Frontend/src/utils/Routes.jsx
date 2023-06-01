@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 // Client Component
 import PrivateRoute from "./PrivateRoute";
@@ -26,34 +26,68 @@ import MerchantDashboard from "../components/Merchan_components/Dashboard";
 import MenuList from "../components/Merchan_components/ShowMenus";
 import AddMenu from "../components/Merchan_components/AddMenu";
 import OrderNow from "../components/Merchan_components/OrderNow";
-import { api, isOnline } from "./UserControl";
+import { getCustomerInfo } from "./UserControl";
 
 export function ClientRoutes() {
+  const customer = getCustomerInfo();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  function handleOnlineEvent() {
-    const storeRequest = JSON.parse(localStorage.getItem("offlineReqeust")) || [];
-    if (storeRequest) {
-      api
-        .post(storeRequest.path, storeRequest.data)
-        .then((res) => {
-          alert(`Auto syncronized: ${res.data}`);
-        })
-        .catch((err) => {
-          alert(`can not auto syncronize: ${err}`);
-        });
+  useEffect(() => {
+    function handleOnlineStatus() {
+      setIsOnline(navigator.onLine);
     }
-  }
 
-  window.addEventListener("online", handleOnlineEvent);
+    window.addEventListener("online", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", handleOnlineStatus);
+      window.removeEventListener("offline", handleOnlineStatus);
+    };
+  }, []);
+
+  const socket = new WebSocket(
+    `ws://localhost:8000/ws?customer_id=${customer.id}`
+  );
+
+  socket.addEventListener("open", () => {
+    console.log("WebSocket connection opened");
+  });
+
+  socket.addEventListener("message", (event) => {
+    console.log("Received message from server:", event.data);
+    // Assuming you have a reference to the service worker registration
+    const serviceWorker = navigator.serviceWorker.controller;
+    if (serviceWorker) {
+      const title = "อาหารพร้อมเสิร์ฟแล้ว!!";
+      const message = "รายการอาหารของคุณได้จัดเตรียมไว้แล้ว";
+      const path = "/client/history"; // Customize the path here
+      const notificationData = { title, message, path };
+      serviceWorker.postMessage(notificationData);
+    }
+  });
+
+  // Add event listener for custom event
+  window.addEventListener("logout", () => {
+    socket.close();
+  });
+
+  socket.addEventListener("close", () => {
+    console.log("WebSocket connection closed");
+  });
+
+  window.addEventListener("beforeunload", () => {
+    socket.close();
+  });
+
   return (
     <div>
       <div>
-        {!isOnline ? (
-          <div class="alert alert-warning" role="alert">
-            {" "}
+        {!isOnline && (
+          <div className="alert alert-danger" role="alert">
             อยู่ในโหมด ออฟไลน์
           </div>
-        ) : null}
+        )}
       </div>
       <Header2 />
       <Routes>
@@ -61,10 +95,10 @@ export function ClientRoutes() {
           <Route index element={<RestaurantList />} />
           <Route path="menus/:rid" element={<Menus />} />
           <Route path="menus/:rid/:id" element={<OrderForm />} />
-          <Route path="cart" element={<Cart />} />
+          <Route path="cart" element={<Cart isOnline={isOnline} />} />
           <Route path="history" element={<OrderHistory />} />
           <Route path="notification" element={<Notification />} />
-          <Route path="*" element-={<NotFound />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </div>
@@ -106,7 +140,7 @@ export function AdminRoutes() {
 export function MerchantRoutes() {
   const location = JSON.parse(localStorage.getItem("restaurant"));
   const socket = new WebSocket(
-    `ws://localhost:8080/ws?restaurant_location_id=${location.id}`
+    `ws://localhost:8000/ws?restaurant_location_id=${location.id}`
   );
 
   socket.addEventListener("open", () => {
@@ -118,9 +152,10 @@ export function MerchantRoutes() {
     // Assuming you have a reference to the service worker registration
     const serviceWorker = navigator.serviceWorker.controller;
     if (serviceWorker) {
-      const message = "New order notification";
+      const title = "ออร์เดอร์มาแล้ว!!";
+      const message = "มีรายการออร์เดอร์เข้ามาใหม่";
       const path = "/merchant/order-now"; // Customize the path here
-      const notificationData = { message, path };
+      const notificationData = { title, message, path };
       serviceWorker.postMessage(notificationData);
     }
   });

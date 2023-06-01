@@ -1,105 +1,136 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Badge, Card } from "react-bootstrap";
+import { api, getCustomerInfo } from "../utils/UserControl";
+import Loading from "./Utility_component/Loading";
 
 const OrderHistory = () => {
-  const orders = [
-    {
-      id: 12345,
-      restaurantName: "The Burger Joint",
-      date: "2023-05-10 12:34:56",
-      status: "success",
-      items: [
-        {
-          id: 1,
-          name: "Classic Cheeseburger",
-          price: 9.99,
-          quantity: 2,
-          note: "No onions please",
-        },
-        { id: 2, name: "Fries", price: 3.99, quantity: 1, note: null },
-        { id: 3, name: "Soda", price: 2.99, quantity: 1, note: "Diet Coke" },
-      ],
-    },
-    {
-      id: 54321,
-      restaurantName: "Pizza Palace",
-      date: "2023-04-22 08:15:00",
-      status: "failed",
-      items: [
-        {
-          id: 4,
-          name: "Pepperoni Pizza",
-          price: 12.99,
-          quantity: 1,
-          note: "Extra cheese",
-        },
-        {
-          id: 5,
-          name: "Garlic Bread",
-          price: 5.99,
-          quantity: 1,
-          note: null,
-        },
-      ],
-    },
-  ];
+  const customer = getCustomerInfo();
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const getData = async () => {
+      try {
+        const response = await api.get(`order/customer/${customer.id}`);
+        const getOrder = response.data || [];
+        const sortedOrders = getOrder.sort((a, b) => {
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          return dateB - dateA;
+        });
+
+        // Fetch restaurant and order information
+        const ordersWithRestaurant = await Promise.all(
+          sortedOrders.map(async (order) => {
+            const restaurantLocationResponse = await api.get(
+              `restaurant/locations/location/${order.restaurant_location_id}`
+            );
+            const restaurantLocationData = restaurantLocationResponse.data;
+            const restaurantId = restaurantLocationData.restaurant_id;
+            const restaurantResponse = await api.get(
+              `restaurants/${restaurantId}`
+            );
+            const restaurantData = restaurantResponse.data;
+            return {
+              ...order,
+              restaurantName: `${restaurantData.name} - ${restaurantLocationData.name}`,
+            };
+          })
+        );
+
+        // Fetch payment details for each order
+        const ordersWithPayment = await Promise.all(
+          ordersWithRestaurant.map(async (order) => {
+            const paymentResponse = await api.get(
+              `payment/${order.payment_id}`
+            );
+            const paymentData = paymentResponse.data;
+            return {
+              ...order,
+              payment: paymentData,
+            };
+          })
+        );
+
+        setOrders(ordersWithPayment);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching order data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    getData();
+  }, [customer.id]);
 
   return (
-    <div style={{ margin: "0 2rem" }}>
-      {orders.map((order) => {
-        // Calculate the total price of the order
-        const totalPrice = order.items.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
-        return (
-          <Card key={order.id} style={{ marginBottom: "20px" }}>
-            <Card.Header>
-              Order #{order.id} - <h2>{order.restaurantName}</h2>
-              <div>
-                Date: <Badge bg="secondary">{order.date}</Badge>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              {order.items.map((item) => (
-                <div key={item.id} style={{ marginBottom: "10px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span>
-                      {item.name} x {item.quantity}
-                    </span>
-                    <span>${item.price * item.quantity}</span>
+    <div>
+      {isLoading && <Loading />}
+      <div style={{ margin: "0 2rem" }}>
+        {orders.map((order) => {
+          return (
+            <Card key={order.id} style={{ marginBottom: "20px" }}>
+              <Card.Header>
+                Order #{order.id} - <h2>{order.restaurantName}</h2>
+                <div>
+                  Date:{" "}
+                  <Badge bg="secondary">
+                    {new Date(order.date).toLocaleString("en-US", {
+                      timeZone: "Asia/Bangkok",
+                    })}
+                  </Badge>
+                </div>
+              </Card.Header>
+              <Card.Body>
+                {order.OrderItems.map((item) => (
+                  <div key={item.id} style={{ marginBottom: "10px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span>
+                        {item.name} x {item.quantity}
+                      </span>
+                    </div>
+                    {item.note && (
+                      <div style={{ fontSize: "0.8em" }}>{item.note}</div>
+                    )}
                   </div>
-                  {item.note && (
-                    <div style={{ fontSize: "0.8em" }}>{item.note}</div>
+                ))}
+              </Card.Body>
+              <Card.Footer>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <div>
+                    Status:{" "}
+                    <Badge
+                      bg={order.status === "success" ? "success" : "secondary"}
+                      style={{ color: "#fff" }}
+                    >
+                      {order.status}
+                    </Badge>
+                  </div>
+                </div>
+                <div>
+                  Payment Price:{" "}
+                  {order.payment && !isNaN(order.payment.price) ? (
+                    <Badge bg="info" style={{ fontSize: "1em" }}>
+                      ${order.payment.price.toFixed(2)}
+                    </Badge>
+                  ) : (
+                    <span>Price Unavailable</span>
                   )}
                 </div>
-              ))}
-            </Card.Body>
-            <Card.Footer>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  Total:{" "}
-                  <Badge bg="primary" style={{ fontSize: "1.2em" }}>
-                    ${totalPrice.toFixed(2)}
-                  </Badge>
-                </div>
-                <div>
-                  Status:{" "}
-                  <Badge bg={order.status === "success" ? "success" : "danger"}>
-                    {order.status}
-                  </Badge>
-                </div>
-              </div>
-            </Card.Footer>
-          </Card>
-        );
-      })}
+              </Card.Footer>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 };

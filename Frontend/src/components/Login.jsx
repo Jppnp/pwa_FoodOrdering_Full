@@ -52,7 +52,7 @@ const Login = () => {
         .catch((err) => {
           console.log("Logging Failed")
           setLoading(false);
-          handleModal(err.response.data.message);
+          handleModal("ชื่อผู้ใช้งาน หรือ รหัสผ่านไม่ถูกต้อง");
         });
     }
   };
@@ -156,7 +156,7 @@ const Login = () => {
           </div>
           <Modal show={showModal} onHide={closeModal}>
             <Modal.Header closeButton>
-              <Modal.Title>Error</Modal.Title>
+              <Modal.Title>ล้มเหลว</Modal.Title>
             </Modal.Header>
             <Modal.Body>{modalMessage}</Modal.Body>
             <Modal.Footer>
