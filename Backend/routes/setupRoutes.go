@@ -4,14 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"pwaV3/controller"
+	websocket "pwaV3/controller/socket"
 )
 
 func SetupRoutes(router *gin.Engine) {
+	manager := websocket.NewClientManager()
+
 	merchantController := &controller.MerchantController{}
 	restaurantController := &controller.RestaurantController{}
 	locationController := &controller.LocationController{}
 	menuController := &controller.MenuController{}
-	OrderController := &controller.OrderController{}
+	OrderController := &controller.OrderController{
+		Manager: manager,
+	}
 	CustomerController := &controller.CustomerController{}
 	PaymentController := &controller.PaymentController{}
 
@@ -82,4 +87,6 @@ func SetupRoutes(router *gin.Engine) {
 		paymentRoutes.GET(":id", PaymentController.GetPayment)
 		paymentRoutes.GET("", PaymentController.GetAllPayment)
 	}
+
+	router.GET("/ws", websocket.ServeWebSocket(manager))
 }

@@ -4,12 +4,17 @@ import (
 	"net/http"
 	"pwaV3/config"
 	"pwaV3/models"
+	"strconv"
 	"time"
+
+	websocket "pwaV3/controller/socket"
 
 	"github.com/gin-gonic/gin"
 )
 
-type OrderController struct{}
+type OrderController struct {
+	Manager *websocket.ClientManager
+}
 
 func (oc *OrderController) CreateOrder(c *gin.Context) {
 	var request struct {
@@ -54,6 +59,9 @@ func (oc *OrderController) CreateOrder(c *gin.Context) {
 			return
 		}
 	}
+	// Send notification to clients with the specific restaurant location ID
+	message := []byte("New order created: " + strconv.FormatUint(uint64(order.ID), 10))
+	oc.Manager.SendToClientByLocationID(order.RestaurantLocationID, message)
 
 	c.JSON(http.StatusCreated, gin.H{"order": order})
 }

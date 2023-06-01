@@ -1,20 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { Card, InputGroup, FormControl } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { api } from "../utils/UserControl";
+import { api, isOnline } from "../utils/UserControl";
 
 const RestaurantCard = ({ restaurant }) => {
   const { id, name, address, restaurant_id } = restaurant;
 
-  const [mainRestaurant, setMainRestaurant] = useState("");
+  const [mainRestaurant, setMainRestaurant] = useState([]);
   useEffect(() => {
     api
       .get(`/restaurants/${restaurant_id}`)
       .then((res) => {
         setMainRestaurant(res.data);
+        const hasData =
+          JSON.parse(localStorage.getItem("restaurantList")) || [];
+        const updataData = {
+          rid: restaurant_id,
+          name: mainRestaurant.name,
+        };
+        if (hasData) {
+          const founded = hasData.filter((item) => item.rid === restaurant_id);
+          if (founded) {
+            const filterData = hasData.filter(
+              (item) => item.rid !== founded.rid
+            );
+            filterData.push(updataData);
+            localStorage.setItem("restaurantList", JSON.stringify(filterData));
+          } else {
+            hasData.push(updataData);
+            localStorage.setItem("restaurantList", JSON.stringify(hasData));
+          }
+        } else {
+          hasData.push(updataData);
+          localStorage.setItem("restaurantList", JSON.stringify(hasData));
+        }
       })
       .catch((err) => {
         console.log(`error while get main restaurant ${err}`);
+        if (!isOnline) {
+          let data = JSON.parse(localStorage.getItem("restaurantList"));
+          data.filter((item) => item.rid === restaurant_id);
+          setMainRestaurant(data);
+        }
       });
   }, [restaurant_id]);
 
@@ -43,9 +70,14 @@ const RestaurantList = () => {
       .get("restaurant/locations")
       .then((res) => {
         setRestaurants(res.data);
+        localStorage.setItem("restaurants", JSON.stringify(res.data));
       })
       .catch((err) => {
         console.log(`Error get restaurant: ${err}`);
+        if (!isOnline) {
+          let data = JSON.parse(localStorage.getItem("restaurants"));
+          setRestaurants(data);
+        }
       });
   }, []);
 
@@ -71,7 +103,7 @@ const RestaurantList = () => {
       </InputGroup>
       <div className="d-flex flex-wrap justify-content-center">
         {filteredRestaurants.map((restaurant) => (
-          <RestaurantCard restaurant={restaurant} key={restaurant.id}/>
+          <RestaurantCard restaurant={restaurant} key={restaurant.id} />
         ))}
       </div>
     </div>

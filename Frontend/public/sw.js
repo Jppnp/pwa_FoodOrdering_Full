@@ -1,5 +1,5 @@
 let cacheData = "pwaV1";
-this.addEventListener("install", (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(cacheData).then((cache) => {
       cache.addAll([
@@ -15,34 +15,58 @@ this.addEventListener("install", (event) => {
   );
 });
 
-this.addEventListener("fetch", (event) => {
-  // event.waitUntil(
-  //     this.registration.showNotification("hello", {
-  //         body: "hello from notification"
-  //     })
-  //     , console.log('ff')
-  // )
+self.addEventListener("fetch", (event) => {
   if (!navigator.onLine) {
     event.respondWith(
-      caches.match(event.request).then((resp) => {
-        if (resp) {
-          return resp;
+      caches.match(event.request).then((response) => {
+        if (response) {
+          return response;
         }
-        let requestUrl = event.request.clone();
-        fetch(requestUrl);
+        return fetch(event.request);
+      })
+    );
+  } else {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        return caches.open(cacheData).then((cache) => {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      }).catch(() => {
+        return caches.match(event.request);
       })
     );
   }
 });
 
-this.addEventListener("notificationclick", (event) => {
+self.addEventListener('message', (event) => {
+  const notificationData = event.data;
+  const message = notificationData.message;
+  const path = notificationData.path;
+
+  // Check if the Notification API permission is granted
+  if (Notification.permission === 'granted') {
+    // Trigger push notification
+    self.registration.showNotification('ออร์เดอร์มาแล้ว!!', {
+      body: message,
+      data: { path }, // Include the path in the notification data
+    });
+  } else {
+    // Permission is not granted, handle it accordingly (e.g., show a fallback message)
+    console.log('Notification permission not granted.');
+  }
+});
+
+
+self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  if (event.action === "view") {
-    console.log('Push notification clicked with action "view".');
-    clients.openWindow(event.notification.data.url);
-  } else if (event.action === "dismiss") {
+  const path = event.notification.data.path; // Retrieve the path from the notification data
+
+  if (event.action === 'view') {
+    event.waitUntil(clients.openWindow(path));
+  } else if (event.action === 'dismiss') {
     console.log('Push notification clicked with action "dismiss".');
   } else {
-    console.log("Push notification clicked with no action.");
+    console.log('Push notification clicked with no action.');
   }
 });

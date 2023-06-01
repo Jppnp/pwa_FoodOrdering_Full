@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, ListGroup, Button } from "react-bootstrap";
-import { api, getCustomerInfo } from "../utils/UserControl";
+import { api, getCustomerInfo, isOnline } from "../utils/UserControl";
 import PaymentSelect from "./Payment";
 import Loading from "./Utility_component/Loading";
 import { useNavigate } from "react-router-dom";
+import CustomModal from "./Utility_component/CustomModal";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -13,11 +14,12 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
   const customer = getCustomerInfo();
   const navigate = useNavigate();
+  const [offlineModal, setOfflineModal] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     const storedCartItems = JSON.parse(localStorage.getItem("cartItems"));
-  
+
     const getName = async (getRid) => {
       try {
         console.log(`get rid: ${cartItems}`);
@@ -25,28 +27,30 @@ const Cart = () => {
           `restaurant/locations/location/${getRid}`
         );
         const { restaurant_id } = locationRes.data;
-  
+
         const restaurantRes = await api.get(`restaurants/${restaurant_id}`);
-  
+
         setRestaurant(restaurantRes.data);
         setLocation(locationRes.data);
       } catch (err) {
         console.log(`error get restaurant name: ${err}`);
       }
     };
-  
+
     if (storedCartItems) {
-      const matching = storedCartItems.carts && storedCartItems.carts.find(
-        (cart) => cart.customer_id === customer.id
-      );
+      const matching =
+        storedCartItems.carts &&
+        storedCartItems.carts.find((cart) => cart.customer_id === customer.id);
       if (matching) {
         setCartItems(matching.cart.items);
-        getName(matching.cart.rid);
+        if (isOnline) {
+          getName(matching.cart.rid);
+        } else {
+        }
       }
     }
     setLoading(false);
   }, []);
-  
 
   const handleClearCart = () => {
     localStorage.removeItem("cartItems");
@@ -75,8 +79,22 @@ const Cart = () => {
     return accumulator + price * quantity;
   }, 0);
 
+  const offlineSubmit = async (accept) => {
+    setOfflineModal(false);
+    if (accept && !isOnline) {
+      setLoading(true);
+      await pushOfflineRequest(`payment`, `post`, data);
+      setLoading(false);
+      navigate("/client/history")
+    }
+  };
+
   const handleSubmit = () => {
-    setShowPayment(true);
+    if (!isOnline) {
+      setOfflineModal(true);
+    } else {
+      setShowPayment(true);
+    }
   };
 
   const selectedPayment = async (payment) => {
@@ -211,6 +229,17 @@ const Cart = () => {
             </Container>
           ) : (
             <PaymentSelect price={totalPrice} selected={selectedPayment} />
+          )}
+          {offlineModal && (
+            <CustomModal
+              modalTitle={"ยืนยันการสั่ง"}
+              message={
+                "ขณะนี้คุณอยู่ในโหมดออฟไลน์ รูปแบบการจ่ายเงินจะเป็นเงินสด และจะสั่งให้อัตโนมัติเมื่อกลับมาออนไลน์อีกครั้ง"
+              }
+              isAccept={offlineSubmit}
+              needConfirm={true}
+              show={true}
+            />
           )}
         </div>
       )}

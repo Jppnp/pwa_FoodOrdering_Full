@@ -10,10 +10,10 @@ import { useNavigate, Link } from "react-router-dom";
 import StoreIcon from "@mui/icons-material/Store";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import FastfoodIcon from '@mui/icons-material/Fastfood';
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import FastfoodIcon from "@mui/icons-material/Fastfood";
 import { merchantLogout } from "../../utils/UserControl";
 
 export default function MerchantSidebar() {
@@ -21,7 +21,7 @@ export default function MerchantSidebar() {
   const { collapseSidebar } = useProSidebar();
   const [showCollapsed, setShowCollapsed] = useState(false);
 
-  const restaurant = JSON.parse(localStorage.getItem("restaurant"))
+  const restaurant = JSON.parse(localStorage.getItem("restaurant"));
 
   useEffect(() => {
     const handleResize = () => {
@@ -38,7 +38,9 @@ export default function MerchantSidebar() {
   }, []);
 
   const handleLogout = () => {
-    merchantLogout()
+    // Dispatch a custom event to trigger WebSocket closure in the parent component
+    window.dispatchEvent(new Event("logout"));
+    merchantLogout();
     navigate("/login");
   };
 
@@ -90,7 +92,11 @@ export default function MerchantSidebar() {
               All orders
             </MenuItem>
           </SubMenu>
-          <MenuItem icon={<LogoutOutlinedIcon />} onClick={handleLogout}>
+          <MenuItem
+            icon={<LogoutOutlinedIcon />}
+            id="logout"
+            onClick={handleLogout}
+          >
             Logout
           </MenuItem>
         </Menu>

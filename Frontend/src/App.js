@@ -11,6 +11,7 @@ import RegistrationForm from "./components/Resgister";
 import LoginMerchant from "./components/Merchan_components/LonginMerchant";
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>

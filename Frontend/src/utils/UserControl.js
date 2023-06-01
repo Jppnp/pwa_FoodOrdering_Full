@@ -1,3 +1,4 @@
+import { HandymanOutlined } from "@mui/icons-material";
 import axios from "axios";
 
 export const api = axios.create({
@@ -14,7 +15,7 @@ export function userLogin(uid, fname, lname, userRole) {
 }
 
 export function adminLogin() {
-  localStorage.setItem("userData", JSON.stringify({"role": "admin"}))
+  localStorage.setItem("userData", JSON.stringify({ role: "admin" }));
 }
 
 export function isLogin() {
@@ -57,6 +58,32 @@ export async function merchantLogin(uid, userRole, restaurant_location_id) {
 }
 
 export function getCustomerInfo() {
-  const customer = JSON.parse(localStorage.getItem("userData"))
-  return customer
+  const customer = JSON.parse(localStorage.getItem("userData"));
+  return customer;
+}
+
+export async function pushOfflineRequest(path, method, data) {
+  try {
+    const offlineRequest = {
+      path,
+      method,
+      data,
+    };
+    const storedRequests =
+      JSON.parse(localStorage.getItem("offlineRequests")) || [];
+    storedRequests.push(offlineRequest);
+    localStorage.setItem("offlineRequests", JSON.stringify(storedRequests));
+  } catch {
+    (err) => {
+      console.log(`cannot auto syncronize: ${err}`);
+    };
+  }
+}
+
+export function isOnline() {
+  if(navigator.onLine){
+    return true
+  }else {
+    return false
+  }
 }

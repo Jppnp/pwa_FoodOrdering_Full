@@ -26,10 +26,35 @@ import MerchantDashboard from "../components/Merchan_components/Dashboard";
 import MenuList from "../components/Merchan_components/ShowMenus";
 import AddMenu from "../components/Merchan_components/AddMenu";
 import OrderNow from "../components/Merchan_components/OrderNow";
+import { api, isOnline } from "./UserControl";
 
 export function ClientRoutes() {
+
+  function handleOnlineEvent() {
+    const storeRequest = JSON.parse(localStorage.getItem("offlineReqeust")) || [];
+    if (storeRequest) {
+      api
+        .post(storeRequest.path, storeRequest.data)
+        .then((res) => {
+          alert(`Auto syncronized: ${res.data}`);
+        })
+        .catch((err) => {
+          alert(`can not auto syncronize: ${err}`);
+        });
+    }
+  }
+
+  window.addEventListener("online", handleOnlineEvent);
   return (
     <div>
+      <div>
+        {!isOnline ? (
+          <div class="alert alert-warning" role="alert">
+            {" "}
+            อยู่ในโหมด ออฟไลน์
+          </div>
+        ) : null}
+      </div>
       <Header2 />
       <Routes>
         <Route element={<PrivateRoute role="client" />}>
@@ -79,6 +104,40 @@ export function AdminRoutes() {
 }
 
 export function MerchantRoutes() {
+  const location = JSON.parse(localStorage.getItem("restaurant"));
+  const socket = new WebSocket(
+    `ws://localhost:8080/ws?restaurant_location_id=${location.id}`
+  );
+
+  socket.addEventListener("open", () => {
+    console.log("WebSocket connection opened");
+  });
+
+  socket.addEventListener("message", (event) => {
+    console.log("Received message from server:", event.data);
+    // Assuming you have a reference to the service worker registration
+    const serviceWorker = navigator.serviceWorker.controller;
+    if (serviceWorker) {
+      const message = "New order notification";
+      const path = "/merchant/order-now"; // Customize the path here
+      const notificationData = { message, path };
+      serviceWorker.postMessage(notificationData);
+    }
+  });
+
+  // Add event listener for custom event
+  window.addEventListener("logout", () => {
+    socket.close();
+  });
+
+  socket.addEventListener("close", () => {
+    console.log("WebSocket connection closed");
+  });
+
+  window.addEventListener("beforeunload", () => {
+    socket.close();
+  });
+
   return (
     <div>
       <div style={{ display: "flex" }}>
