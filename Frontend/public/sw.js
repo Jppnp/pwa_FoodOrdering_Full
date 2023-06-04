@@ -78,27 +78,42 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(event.request.url);
 
   if (requestUrl.origin === "http://localhost:8000") {
-    console.log(`Getting  Path: ${requestUrl}`)
+    console.log(`Getting Path: ${requestUrl}`);
     event.respondWith(
-      caches.open(cacheData).then(async (cache) => {
-        const response = await cache.match(event.request);
-        if (response) {
-          return response; // คืนข้อมูลจากแคชหากมีอยู่
-        }
-        const networkResponse = await fetch(event.request);
-        if (networkResponse.ok) {
-          // ข้อมูลสำเร็จ ทำการบันทึกลงแคชเพื่อใช้ในการออฟไลน์ในอนาคต
-          const clonedResponse = networkResponse.clone();
-          cache.put(event.request, clonedResponse);
-        }
-        return networkResponse;
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          const clonedResponse = networkResponse.clone(); // Clone response before using its body
+          // อัพเดตแคชเมื่อออนไลน์
+          if (networkResponse.ok) {
+            caches.open(cacheData).then((cache) => {
+              cache.put(event.request, clonedResponse);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // หากการเชื่อมต่อล้มเหลว ใช้ข้อมูลจากแคช
+          return caches.match(event.request);
+        })
     );
   } else {
+    console.log(`Getting No Path: ${requestUrl}`);
     event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request);
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          const clonedResponse = networkResponse.clone(); // Clone response before using its body
+          // อัพเดตแคชเมื่อออนไลน์
+          if (networkResponse.ok) {
+            caches.open(cacheData).then((cache) => {
+              cache.put(event.request, clonedResponse);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // หากการเชื่อมต่อล้มเหลว ใช้ข้อมูลจากแคช
+          return caches.match(event.request);
+        })
     );
   }
 });

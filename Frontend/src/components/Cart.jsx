@@ -105,6 +105,26 @@ const Cart = ({ isOnline }) => {
       setShowPayment(true);
     }
   };
+  function handleNotificationPermission() {
+    if (navigator.serviceWorker && typeof Notification !== "undefined") {
+      navigator.serviceWorker
+        .register("service-worker.js")
+        .then((registration) => {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              console.log("Permission for push notifications granted");
+              // ดำเนินการอื่น ๆ ที่ต้องการหลังจากได้รับอนุญาต
+            } else {
+              console.log("Permission for push notifications denied");
+              // ดำเนินการอื่น ๆ ที่ต้องการหลังจากถูกปฏิเสธ
+            }
+          });
+        })
+        .catch((error) => {
+          console.log("Service worker registration failed:", error);
+        });
+    }
+  }
 
   const selectedPayment = async (payment) => {
     setShowPayment(false);
@@ -121,6 +141,7 @@ const Cart = ({ isOnline }) => {
         await api.post("order", JSON.stringify(newOrder));
         removeCart();
         setLoading(false);
+        handleNotificationPermission()
         navigate("/client/history");
       } catch (err) {
         console.log(`has error while create order: ${err}`);
