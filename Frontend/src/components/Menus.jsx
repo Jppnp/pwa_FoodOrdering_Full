@@ -96,7 +96,7 @@ export default function Menus() {
                               <Card.Img
                                 src={item.image_path}
                                 alt={item.name}
-                                style={{ width: "130px", height: "100px" }}
+                                style={{ width: "100px", height: "80px" }}
                               />
                             </Col>
                             <Col xs={8} md={8}>

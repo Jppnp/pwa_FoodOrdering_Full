@@ -78,7 +78,6 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(event.request.url);
 
   if (requestUrl.origin === "http://localhost:8000") {
-    console.log(`Getting Path: ${requestUrl}`);
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
@@ -97,7 +96,6 @@ self.addEventListener("fetch", (event) => {
         })
     );
   } else {
-    console.log(`Getting No Path: ${requestUrl}`);
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {

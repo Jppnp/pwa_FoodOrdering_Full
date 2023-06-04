@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
 export default function Header2() {
-  const user = JSON.parse(localStorage.getItem("userData"))
+  const user = JSON.parse(localStorage.getItem("userData"));
   return (
     <Navbar
       collapseOnSelect
@@ -19,7 +19,7 @@ export default function Header2() {
       }}
     >
       <Container>
-        <Navbar.Brand href="/client/">
+        <Navbar.Brand as={Link} to="/client/">
           <img
             alt=""
             src={"../assets/profile2.png"}
@@ -28,7 +28,9 @@ export default function Header2() {
             className="d-inline-block align-top"
             style={{ marginRight: "1rem" }}
           />
-          <span>ยินดีต้อนรับ, {user.fname} {user.lname}</span>
+          <span>
+            ยินดีต้อนรับ, {user.fname} {user.lname}
+          </span>
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="navbarScroll"
