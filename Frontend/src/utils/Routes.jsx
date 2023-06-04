@@ -36,15 +36,17 @@ export function ClientRoutes() {
     function handleOnlineStatus() {
       setIsOnline(navigator.onLine);
     }
-
+  
     window.addEventListener("online", handleOnlineStatus);
     window.addEventListener("offline", handleOnlineStatus);
-
+  
     return () => {
       window.removeEventListener("online", handleOnlineStatus);
       window.removeEventListener("offline", handleOnlineStatus);
     };
   }, []);
+  
+  
 
   const socket = new WebSocket(
     `ws://localhost:8000/ws?customer_id=${customer.id}`

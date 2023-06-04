@@ -22,7 +22,7 @@ export default function Header2() {
         <Navbar.Brand href="/client/">
           <img
             alt=""
-            src={require("../assets/profile2.png")}
+            src={"../assets/profile2.png"}
             width="30"
             height="30"
             className="d-inline-block align-top"
@@ -42,12 +42,10 @@ export default function Header2() {
             <NavLink as={Link} to="/client/history ">
               History
             </NavLink>
+            <Nav.Link as={Logout} />
           </Nav>
         </Navbar.Collapse>
       </Container>
-      <Nav>
-        <Nav.Link as={Logout} />
-      </Nav>
     </Navbar>
   );
 }

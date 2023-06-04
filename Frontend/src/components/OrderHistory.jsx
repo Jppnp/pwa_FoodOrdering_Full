@@ -3,8 +3,9 @@ import { Badge, Card } from "react-bootstrap";
 import { api, getCustomerInfo } from "../utils/UserControl";
 import Loading from "./Utility_component/Loading";
 
+const customer = getCustomerInfo();
+
 const OrderHistory = () => {
-  const customer = getCustomerInfo();
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -12,6 +13,7 @@ const OrderHistory = () => {
     setIsLoading(true);
     const getData = async () => {
       try {
+        
         const response = await api.get(`order/customer/${customer.id}`);
         const getOrder = response.data || [];
         const sortedOrders = getOrder.sort((a, b) => {
@@ -19,6 +21,7 @@ const OrderHistory = () => {
           const dateB = new Date(b.date).getTime();
           return dateB - dateA;
         });
+        console.log(`data: ${sortedOrders.length}`)
 
         // Fetch restaurant and order information
         const ordersWithRestaurant = await Promise.all(
@@ -60,9 +63,8 @@ const OrderHistory = () => {
         setIsLoading(false);
       }
     };
-
     getData();
-  }, [customer.id]);
+  }, []);
 
   return (
     <div>

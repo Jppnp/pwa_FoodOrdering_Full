@@ -29,41 +29,43 @@ const RestaurantCard = ({ restaurant }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    api
-      .get(`/restaurants/${restaurant_id}`)
-      .then((res) => {
-        setMainRestaurant(res.data);
+    const fetchData = async () => {
+      try {
+        const response = await api.get(`/restaurants/${restaurant_id}`);
+        const restaurantData = response.data;
+
+        setMainRestaurant(restaurantData);
+
         const hasData =
-          JSON.parse(localStorage.getItem("restaurantList")) || [];
-        const updataData = {
+          JSON.parse(localStorage.getItem("RestaurantList")) || [];
+        const updatedData = {
           rid: restaurant_id,
-          name: res.data.name,
+          name: restaurantData.name,
         };
-        if (hasData) {
-          const founded = hasData.filter((item) => item.rid === restaurant_id);
-          if (founded) {
-            const filterData = hasData.filter(
-              (item) => item.rid !== founded.rid
-            );
-            filterData.push(updataData);
-            localStorage.setItem("restaurantList", JSON.stringify(filterData));
-          } else {
-            hasData.push(updataData);
-            localStorage.setItem("restaurantList", JSON.stringify(hasData));
-          }
-        } else {
-          hasData.push(updataData);
-          localStorage.setItem("restaurantList", JSON.stringify(hasData));
+
+        const foundedIndex = hasData.findIndex(
+          (item) => item.rid === restaurant_id
+        );
+        if (foundedIndex !== -1) {
+          hasData.splice(foundedIndex, 1);
         }
-      })
-      .catch((err) => {
-        console.log(`error while get main restaurant ${err}`);
+
+        hasData.push(updatedData);
+        localStorage.setItem("RestaurantList", JSON.stringify(hasData));
+      } catch (error) {
+        console.log(`Error while fetching main restaurant: ${error}`);
+
         if (!isOnline) {
-          let data = JSON.parse(localStorage.getItem("restaurantList"));
-          data.filter((item) => item.rid === restaurant_id);
-          setMainRestaurant(data);
+          const data = JSON.parse(localStorage.getItem("RestaurantList"));
+          const foundRestaurant = data.find(
+            (item) => item.rid === restaurant_id
+          );
+          setMainRestaurant(foundRestaurant);
         }
-      });
+      }
+    };
+
+    fetchData();
 
     // Get the current location using Geolocation API
     if ("geolocation" in navigator) {
@@ -112,21 +114,30 @@ const RestaurantList = () => {
   const [restaurants, setRestaurants] = useState([]);
 
   useEffect(() => {
-    api
-      .get("restaurant/locations")
-      .then((res) => {
-        setRestaurants(res.data);
-        localStorage.setItem("restaurants", JSON.stringify(res.data));
-      })
-      .catch((err) => {
+    const fetchRestaurants = async () => {
+      try {
+        const response = await api.get("restaurant/locations");
+        const data = response.data;
+
+        setRestaurants(data);
+        localStorage.setItem("restaurants", JSON.stringify(data));
+      } catch (err) {
         console.log(`Error get restaurant: ${err}`);
+
         if (!isOnline) {
-          let data = JSON.parse(localStorage.getItem("restaurants"));
+          const data = JSON.parse(localStorage.getItem("restaurants"));
           setRestaurants(data);
         }
-      });
-  }, []);
+      }
+    };
 
+    if (!isOnline) {
+      const data = JSON.parse(localStorage.getItem("restaurants"));
+      setRestaurants(data);
+    } else {
+      fetchRestaurants();
+    }
+  }, []);
   const filteredRestaurants = restaurants.filter((restaurant) =>
     restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
