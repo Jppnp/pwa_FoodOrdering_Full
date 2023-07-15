@@ -1,1 +1,11 @@
 ./run_docker_compose.sh 
+
+Admin Use Customer Login for login
+id:admin
+pass:admin
+
+First of all, create some restuarant and create some branch for that restaurant.
+Then, create people who as branch's manager.
+Finally, use email and password for manage to create menu of your branch
+
+Please feel free to try, thnak you
